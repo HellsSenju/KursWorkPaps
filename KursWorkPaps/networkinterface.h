@@ -12,6 +12,7 @@ class NetworkInterface : public QObject
 public:
     explicit NetworkInterface(QObject *parent = nullptr);
     static QStringList getNetworkInterfacesList();
+    static QStringList getExistingRules(QString interface);
 
 signals:
 

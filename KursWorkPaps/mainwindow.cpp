@@ -15,3 +15,10 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
+
+void MainWindow::on_comboBox_network_interfaces_currentTextChanged(const QString &arg1)
+{
+    ui->listWidget_rules->clear();
+    ui->listWidget_rules->addItems(NetworkInterface::getExistingRules(arg1));
+}
+
