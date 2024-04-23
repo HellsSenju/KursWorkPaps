@@ -4,6 +4,8 @@
 #include <QObject>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
+#include <QTcpServer>
+#include <QTcpSocket>
 
 class Api : public QObject
 {
