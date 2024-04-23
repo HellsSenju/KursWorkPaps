@@ -40,30 +40,30 @@
 # Reference: https://intellij-support.jetbrains.com/hc/en-us/articles/206544839
 
 # User-specific stuff
-.idea/**/workspace.xml
-.idea/**/tasks.xml
-.idea/**/usage.statistics.xml
-.idea/**/dictionaries
-.idea/**/shelf
+.IperfManager/idea/**/workspace.xml
+.IperfManager/idea/**/tasks.xml
+.IperfManager/idea/**/usage.statistics.xml
+.IperfManager/idea/**/dictionaries
+.IperfManager/idea/**/shelf
 
 # AWS User-specific
-.idea/**/aws.xml
+.IperfManager/idea/**/aws.xml
 
 # Generated files
-.idea/**/contentModel.xml
+.IperfManager/idea/**/contentModel.xml
 
 # Sensitive or high-churn files
-.idea/**/dataSources/
-.idea/**/dataSources.ids
-.idea/**/dataSources.local.xml
-.idea/**/sqlDataSources.xml
-.idea/**/dynamic.xml
-.idea/**/uiDesigner.xml
-.idea/**/dbnavigator.xml
+.IperfManager/idea/**/dataSources/
+.IperfManager/idea/**/dataSources.ids
+.IperfManager/idea/**/dataSources.local.xml
+.IperfManager/idea/**/sqlDataSources.xml
+.IperfManager/idea/**/dynamic.xml
+.IperfManager/idea/**/uiDesigner.xml
+.IperfManager/idea/**/dbnavigator.xml
 
 # Gradle
-.idea/**/gradle.xml
-.idea/**/libraries
+.IperfManager/idea/**/gradle.xml
+.IperfManager/idea/**/libraries
 
 # Gradle and Maven with auto-import
 # When using Gradle or Maven with auto-import, you should exclude module files,
