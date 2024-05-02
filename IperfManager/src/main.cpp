@@ -11,7 +11,7 @@ QString searchConfigFile()
 {
     QString binDir=QCoreApplication::applicationDirPath();
     QString appName=QCoreApplication::applicationName();
-    QString fileName("Demo1.ini");
+    QString fileName("IperfManager.ini");
 
     QStringList searchList;
     searchList.append(binDir);
@@ -71,16 +71,8 @@ int main(int argc, char *argv[])
     listenerSettings->beginGroup("listener");
     new HttpListener(listenerSettings,new RequestMapper(&app),&app);
 
-    IperfServer server;
-    QStringList list;
-    list << "-s";
-    list << "-p 20000";
-    list << "-u";
-    list << "-i 1";
-    list << "-t 1005";
-    server.setParams("iperf", list);
-    server.start();
-
-    return app.exec();
+    qWarning("Application has started");
+    app.exec();
+    qWarning("Application has stopped");
 }
 

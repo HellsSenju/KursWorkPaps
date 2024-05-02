@@ -14,6 +14,9 @@ public:
     TestController();
 
     void service(HttpRequest& request, HttpResponse& response);
+
+private:
+    QJsonObject parseRequest(const QString& in);
 };
 
 #endif // TESTCONTROLLER_H

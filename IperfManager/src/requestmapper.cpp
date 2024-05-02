@@ -1,5 +1,6 @@
 #include "requestmapper.h"
 #include "global.h"
+#include "testcontroller.h"
 
 RequestMapper::RequestMapper(QObject* parent)
     :HttpRequestHandler(parent)
@@ -19,9 +20,9 @@ void RequestMapper::service(HttpRequest& request, HttpResponse& response)
 
     // For the following pathes, each request gets its own new instance of the related controller.
 
-    if (path.startsWith("/dump"))
+    if (path.startsWith("/test"))
     {
-        DumpController().service(request, response);
+        TestController().service(request, response);
     }
 
 
