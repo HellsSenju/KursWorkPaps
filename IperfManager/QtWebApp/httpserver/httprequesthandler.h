@@ -10,6 +10,9 @@
 #include "httprequest.h"
 #include "httpresponse.h"
 
+#include <QJsonObject>
+#include <QJsonDocument>
+
 namespace stefanfrings {
 
 /**
@@ -46,6 +49,30 @@ public:
     */
     virtual void service(HttpRequest& request, HttpResponse& response);
 
+    virtual QJsonObject parseRequest(const QString& in)
+    {
+        QJsonObject obj;
+
+        QJsonDocument doc = QJsonDocument::fromJson(in.toUtf8());
+
+        if(!doc.isNull())
+        {
+            if(doc.isObject())
+            {
+                obj = doc.object();
+            }
+            else
+            {
+                qDebug() << "Document is not an object";
+            }
+        }
+        else
+        {
+            qDebug() << "Invalid JSON" << in;
+        }
+
+        return obj;
+    };
 };
 
 } // end of namespace

@@ -35,29 +35,3 @@ void TestController::service(HttpRequest &request, HttpResponse &response)
         response.write(QJsonDocument(object).toJson(QJsonDocument::Compact), true);
     }
 }
-
-QJsonObject TestController::parseRequest(const QString& in)
-{
-    QJsonObject obj;
-
-    QJsonDocument doc = QJsonDocument::fromJson(in.toUtf8());
-
-    // check validity of the document
-    if(!doc.isNull())
-    {
-        if(doc.isObject())
-        {
-            obj = doc.object();
-        }
-        else
-        {
-            qDebug() << "Document is not an object";
-        }
-    }
-    else
-    {
-        qDebug() << "Invalid JSON" << in;
-    }
-
-    return obj;
-}
