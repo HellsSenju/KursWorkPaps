@@ -2,6 +2,7 @@
 
 StartController::StartController()
 {
+    connect(this, &StartController::start, manager, &IperfManager::onStart);
 
 }
 
@@ -13,6 +14,8 @@ void StartController::service(HttpRequest &request, HttpResponse &response)
     if(req.contains("server")){
         response.setStatus(200,"Ok");
         response.setHeader("Content-Type", "application/json");
+
+        emit start(true, req["uuid"].toString(), req["command"].toString());
     }
 
     else if(req.contains("client")){

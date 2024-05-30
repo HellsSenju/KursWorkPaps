@@ -10,13 +10,15 @@ OTHER_FILES += etc/* logs/*
 
 SOURCES += \
     src/global.cpp \
-    src/requestmapper.cpp \
-        src/main.cpp \
-        src/iperfserver.cpp \
-    src/startcontroller.cpp \
-    src/statisticcontroller.cpp \
-    src/stopcontroller.cpp \
-    src/testcontroller.cpp
+    src/iperfmanager.cpp \
+    src/controllers/requestmapper.cpp \
+    src/main.cpp \
+    src/model/iperfclient.cpp \
+    src/model/iperfserver.cpp \
+    src/controllers/startcontroller.cpp \
+    src/controllers/statisticcontroller.cpp \
+    src/controllers/stopcontroller.cpp \
+    src/controllers/testcontroller.cpp
 
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
@@ -25,15 +27,20 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 
 HEADERS += \
     src/global.h \
-    src/requestmapper.h \
-    src/abstractiperf.h \
-    src/iperfserver.h \
-    src/startcontroller.h \
-    src/statisticcontroller.h \
-    src/stopcontroller.h \
-    src/testcontroller.h
+    src/iperfmanager.h \
+    src/controllers/requestmapper.h \
+    src/model/abstractiperf.h \
+    src/model/iperfclient.h \
+    src/model/iperfserver.h \
+    src/controllers/startcontroller.h \
+    src/controllers/statisticcontroller.h \
+    src/controllers/stopcontroller.h \
+    src/controllers/testcontroller.h
 
 include(QtWebApp/httpserver/httpserver.pri)
 include(QtWebApp/logging/logging.pri)
 
 # Not used: include(QtWebApp/templateengine/templateengine.pri)
+
+DISTFILES += \
+    logs/uuids

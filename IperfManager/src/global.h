@@ -5,6 +5,7 @@
 #include "httpsessionstore.h"
 #include "staticfilecontroller.h"
 #include "filelogger.h"
+#include "iperfmanager.h"
 
 using namespace stefanfrings;
 
@@ -22,5 +23,7 @@ extern  StaticFileController* staticFileController;
 
 /** Redirects log messages to a file */
 extern  FileLogger* logger;
+
+extern IperfManager* manager;
 
 #endif // GLOBAL_H

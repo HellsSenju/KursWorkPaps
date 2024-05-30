@@ -5,6 +5,7 @@
 #include <QObject>
 #include <QProcess>
 #include <QDebug>
+#include <QUuid>
 
 class AbstractIperf : public QObject
 {
@@ -22,7 +23,12 @@ public:
 
 protected:
     QProcess *process = nullptr;
+    QUuid processUuid;
 
+protected slots:
+    virtual void output() = 0;
+    virtual void error() = 0;
+    virtual bool started() = 0;
 
 signals:
 

@@ -1,12 +1,13 @@
 #include <QCoreApplication>
 #include <QDir>
 #include <QSettings>
-#include "iperfserver.h"
+#include <QUuid>
+
+#include "model/iperfserver.h"
 #include "httplistener.h"
 #include "global.h"
-#include "requestmapper.h"
+#include "controllers/requestmapper.h"
 
-/** Search the configuration file */
 QString searchConfigFile()
 {
     QString binDir=QCoreApplication::applicationDirPath();
@@ -47,29 +48,38 @@ int main(int argc, char *argv[])
     QCoreApplication app(argc, argv);
     app.setApplicationName("IperfManager");
 
-    // Find the configuration file
+    // поиск конфигурационного файла
     QString configFileName=searchConfigFile();
 
-    // Configure logging into a file
-    QSettings* logSettings=new QSettings(configFileName,QSettings::IniFormat,&app);
+    // настройка логирования в файл
+    QSettings* logSettings=new QSettings(configFileName,QSettings::IniFormat, &app);
     logSettings->beginGroup("logging");
-    FileLogger* logger=new FileLogger(logSettings,10000,&app);
+    FileLogger* logger = new FileLogger(logSettings, 10000, &app);
     logger->installMsgHandler();
 
-    // Configure session store
-    QSettings* sessionSettings=new QSettings(configFileName,QSettings::IniFormat,&app);
+    // настройка session store
+    QSettings* sessionSettings = new QSettings(configFileName,QSettings::IniFormat, &app);
     sessionSettings->beginGroup("sessions");
-    sessionStore=new HttpSessionStore(sessionSettings,&app);
+    sessionStore=new HttpSessionStore(sessionSettings, &app);
 
-    // Configure static file controller
-    QSettings* fileSettings=new QSettings(configFileName,QSettings::IniFormat,&app);
+    // настройка static file controller
+    QSettings* fileSettings = new QSettings(configFileName,QSettings::IniFormat, &app);
     fileSettings->beginGroup("docroot");
-    staticFileController=new StaticFileController(fileSettings,&app);
+    staticFileController = new StaticFileController(fileSettings, &app);
 
-    // Configure and start the TCP listener
-    QSettings* listenerSettings=new QSettings(configFileName,QSettings::IniFormat,&app);
+    // настройка и старт TCP listener
+    QSettings* listenerSettings = new QSettings(configFileName,QSettings::IniFormat, &app);
     listenerSettings->beginGroup("listener");
-    new HttpListener(listenerSettings,new RequestMapper(&app),&app);
+    new HttpListener(listenerSettings, new RequestMapper(&app), &app);
+
+    // создание менеджера процессов iperf
+    manager = new IperfManager();
+
+//    qDebug() << QUuid::createUuid().toString();
+//    qDebug() << QUuid::createUuid().toString();
+//    qDebug() << QUuid::createUuid().toString();
+//    qDebug() << QUuid::createUuid().toString();
+//    qDebug() << QUuid::createUuid().toString();
 
     qWarning("Application has started");
     app.exec();

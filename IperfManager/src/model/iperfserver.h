@@ -7,8 +7,9 @@
 class IperfServer : public AbstractIperf
 {
     Q_OBJECT
+
 public:
-    explicit IperfServer();
+    explicit IperfServer(QUuid processUuid);
     ~IperfServer();
 
     void setParams(const QString &program, const QStringList &args);
@@ -18,7 +19,9 @@ public:
 
 private slots:
     void output();
+    void error();
     bool started();
+
 //    bool finished(int exitCode, QProcess::ExitStatus exitStatus);
 
 };

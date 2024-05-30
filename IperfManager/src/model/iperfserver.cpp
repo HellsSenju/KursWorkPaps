@@ -1,10 +1,13 @@
 #include "iperfserver.h"
 
-IperfServer::IperfServer()
+IperfServer::IperfServer(QUuid processUuid)
 {
     process = new QProcess();
+    this->processUuid = processUuid;
+
     connect(process, &QProcess::started, this, &IperfServer::started);
     connect(process, &QProcess::readyReadStandardOutput, this, &IperfServer::output);
+    connect(process, &QProcess::readyReadStandardError, this, &IperfServer::error);
 
 //    connect(process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
 //        [=](int exitCode, QProcess::ExitStatus exitStatus){
@@ -41,6 +44,11 @@ void IperfServer::waitForFinished(int sec)
 }
 
 void IperfServer::output()
+{
+    qDebug() << process->readAll();
+}
+
+void IperfServer::error()
 {
     qDebug() << process->readAll();
 }

@@ -2,6 +2,9 @@
 #define STARTCONTROLLER_H
 
 #include "httprequesthandler.h"
+#include "../global.h"
+
+#include <QObject>
 
 using namespace stefanfrings;
 
@@ -14,6 +17,9 @@ public:
     StartController();
 
     void service(HttpRequest& request, HttpResponse& response);
+
+signals:
+    void start(bool server, const QString &uuid, const QString &command);
 };
 
 #endif // STARTCONTROLLER_H
