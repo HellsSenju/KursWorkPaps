@@ -5,6 +5,7 @@
 #include <QDebug>
 #include <QList>
 #include <QUuid>
+#include <QStringList>
 
 #include "model/abstractiperf.h"
 #include "model/iperfserver.h"

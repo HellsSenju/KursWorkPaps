@@ -25,5 +25,7 @@ void IperfManager::onStart(bool server, const QString &uuid, const QString &comm
 
     iperfsPool.append(iperf);
 
-//    iperf->setParams("iperf", );
+    iperf->setParams("iperf", QStringList{ command });
+
+    iperf->start();
 }
