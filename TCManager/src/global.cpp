@@ -3,5 +3,5 @@
 HttpSessionStore* sessionStore;
 StaticFileController* staticFileController;
 FileLogger* logger;
-IperfManager* manager;
+ProcessesPool* pool;
 

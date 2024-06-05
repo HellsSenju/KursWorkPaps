@@ -37,8 +37,8 @@ HEADERS += \
     src/controllers/stopcontroller.h \
     src/controllers/testcontroller.h
 
-include(QtWebApp/httpserver/httpserver.pri)
-include(QtWebApp/logging/logging.pri)
+include(../QtWebApp/httpserver/httpserver.pri)
+include(../QtWebApp/logging/logging.pri)
 
 # Not used: include(QtWebApp/templateengine/templateengine.pri)
 

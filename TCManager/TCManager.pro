@@ -10,9 +10,12 @@ OTHER_FILES += etc/* logs/*
 
 
 SOURCES += \
+    src/controllers/addcontroller.cpp \
     src/global.cpp \
     src/controllers/requestmapper.cpp \
     src/controllers/testcontroller.cpp \
+    src/processespool.cpp \
+    src/models/tcprocess.cpp \
     src/main.cpp
 
 
@@ -21,13 +24,16 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 HEADERS += \
+    src/controllers/addcontroller.h \
     src/global.h \
     src/controllers/requestmapper.h \
     src/controllers/startcontroller.h \
-    src/controllers/testcontroller.h
+    src/controllers/testcontroller.h \
+    src/processespool.h \
+    src/models/tcprocess.h
 
-include(QtWebApp/httpserver/httpserver.pri)
-include(QtWebApp/logging/logging.pri)
+include(../QtWebApp/httpserver/httpserver.pri)
+include(../QtWebApp/logging/logging.pri)
 
 # Not used: include(QtWebApp/templateengine/templateengine.pri)
 

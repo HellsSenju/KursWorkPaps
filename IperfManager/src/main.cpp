@@ -3,7 +3,7 @@
 #include <QSettings>
 #include <QUuid>
 
-#include "model/iperfserver.h"
+#include "models/iperfserver.h"
 #include "httplistener.h"
 #include "global.h"
 #include "controllers/requestmapper.h"

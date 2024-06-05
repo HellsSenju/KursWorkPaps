@@ -8,16 +8,16 @@
 #include <QUuid>
 #include <QStringList>
 
-#include "model/abstractiperf.h"
-#include "model/iperfserver.h"
-#include "model/iperfclient.h"
+#include "models/abstractiperf.h"
+#include "models/iperfserver.h"
+#include "models/iperfclient.h"
 
 class IperfManager : public QObject
 {
     Q_OBJECT
 
 public:
-    IperfManager(QObject* parent=0);
+    explicit IperfManager(QObject* parent=0);
     ~IperfManager();
 
 private:

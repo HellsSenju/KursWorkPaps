@@ -2,7 +2,6 @@
 #include "../global.h"
 #include "testcontroller.h"
 #include "startcontroller.h"
-#include "stopcontroller.h"
 #include "statisticcontroller.h"
 
 RequestMapper::RequestMapper(QObject* parent)
@@ -24,12 +23,7 @@ void RequestMapper::service(HttpRequest& request, HttpResponse& response)
     HttpSession session = sessionStore->getSession(request, response);
     qDebug("RequestMapper: sessionId = %s", session.getId().data());
 
-    if (path.startsWith("/test"))
-    {
-        TestController().service(request, response);
-    }
-
-    else if (path.startsWith("/start"))
+    if (path.startsWith("/start"))
     {
         StartController().service(request, response);
     }
