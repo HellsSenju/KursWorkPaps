@@ -6,15 +6,15 @@ QT += core
 CONFIG += c++11 console
 CONFIG -= app_bundle
 
-OTHER_FILES += etc/* logs/*
+OTHER_FILES += etc/* logs/* otherFiles/*
 
 SOURCES += \
     src/global.cpp \
     src/iperfmanager.cpp \
     src/controllers/requestmapper.cpp \
     src/main.cpp \
-    src/model/iperfclient.cpp \
-    src/model/iperfserver.cpp \
+    src/models/iperfclient.cpp \
+    src/models/iperfserver.cpp \
     src/controllers/startcontroller.cpp \
     src/controllers/statisticcontroller.cpp \
     src/controllers/stopcontroller.cpp \
@@ -29,9 +29,9 @@ HEADERS += \
     src/global.h \
     src/iperfmanager.h \
     src/controllers/requestmapper.h \
-    src/model/abstractiperf.h \
-    src/model/iperfclient.h \
-    src/model/iperfserver.h \
+    src/models/abstractiperf.h \
+    src/models/iperfclient.h \
+    src/models/iperfserver.h \
     src/controllers/startcontroller.h \
     src/controllers/statisticcontroller.h \
     src/controllers/stopcontroller.h \

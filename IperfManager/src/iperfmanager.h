@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QDebug>
 #include <QList>
+#include <QMap>
 #include <QUuid>
 #include <QStringList>
 
@@ -21,9 +22,14 @@ public:
 
 private:
     QList<AbstractIperf*> iperfsPool;
+    QMap<QString, AbstractIperf*> pool;
+
 
 public slots:
-    void onStart(bool server, const QString &uuid, const QString &command);
+    void startNewProcess(bool server, const QString &uuid, const QString &command);
+    void stopProcess(const QString &uuid);
+
+    void onProcessStateChaned(const QString &uuid, ProcessState state);
 
 };
 

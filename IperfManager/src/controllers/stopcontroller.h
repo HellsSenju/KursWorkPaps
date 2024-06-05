@@ -2,6 +2,8 @@
 #define STOPCONTROLLER_H
 
 #include "httprequesthandler.h"
+#include "../global.h"
+
 
 using namespace stefanfrings;
 
@@ -14,6 +16,9 @@ public:
     StopController();
 
     void service(HttpRequest& request, HttpResponse& response);
+
+signals:
+    void stop(const QString &uuid);
 };
 
 #endif // STOPCONTROLLER_H
