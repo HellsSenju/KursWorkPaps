@@ -27,7 +27,8 @@ signals:
     void started(const QString &uuid);
     void finished(const QString &uuid);
 
-    void processStateChaned(const QString &uuid, ProcessState state);
+    void processStateChaned(const QString uuid, ProcessState state);
+    void stateChanged(ProcessState state);
 
 //    bool finished(int exitCode, QProcess::ExitStatus exitStatus);
 

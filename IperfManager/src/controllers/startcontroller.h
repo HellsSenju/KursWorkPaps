@@ -5,6 +5,7 @@
 #include "../global.h"
 
 #include <QObject>
+#include <QEventLoop>
 
 using namespace stefanfrings;
 
@@ -18,8 +19,6 @@ public:
 
     void service(HttpRequest& request, HttpResponse& response);
 
-signals:
-    void start(bool server, const QString &uuid, const QString &command);
 };
 
 #endif // STARTCONTROLLER_H

@@ -27,7 +27,10 @@ void IperfManager::startNewProcess(bool server, const QString &uuid, const QStri
 
     if(server){
         iperf = new IperfServer(uuid);
-        connect(qobject_cast<IperfServer*>(iperf), &IperfServer::processStateChaned, this, &IperfManager::onProcessStateChaned);
+        connect(qobject_cast<IperfServer*>(iperf),
+                &IperfServer::stateChanged,
+                this,
+                &IperfManager::onProcessStateChaned);
     }
 //    else
 //        iperf = new IperfClient(uuid);
@@ -47,29 +50,46 @@ void IperfManager::stopProcess(const QString &uuid)
     pool[uuid]->stop();
 }
 
-void IperfManager::onProcessStateChaned(const QString &uuid, ProcessState state)
+void IperfManager::onProcessStateChaned(const QString uuid, ProcessState state)
 {
-    qDebug("IperfManager : onProcessStateChaned : %s", qPrintable(uuid));
-
     switch (state) {
     case ProcessState::Starting:
-
+        qDebug("IperfManager : ProcessState::Starting : %s", qPrintable(uuid));
         break;
     case ProcessState::Running:
-
+        qDebug("IperfManager : ProcessState::Running : %s", qPrintable(uuid));
+        emit iperfStarted(true);
+        emit started();
         break;
     case ProcessState::Finished:
-        pool[uuid]->deleteLater();
+    {
+        AbstractIperf *deleted = pool[uuid];
+
+        disconnect(qobject_cast<IperfServer*>(deleted),
+                &IperfServer::processStateChaned,
+                this,
+                &IperfManager::onProcessStateChaned);
+
         pool.remove(uuid);
+        deleted->deleteLater();
         qDebug("IperfManager : onProcessStateChaned : %s удален из пула", qPrintable(uuid));
+    }
         break;
     case ProcessState::Crashed:
-
+        qDebug("IperfManager : ProcessState::Crashed : %s", qPrintable(uuid));
         break;
     case ProcessState::FaledToStart:
-
+        qDebug("IperfManager : ProcessState::FaledToStart : %s", qPrintable(uuid));
+        emit iperfStarted(false);
         break;
     default:
         break;
     }
+}
+
+void IperfManager::onStateChanged(ProcessState state)
+{
+    AbstractIperf* iperf = qobject_cast<AbstractIperf*>(sender());
+
+
 }

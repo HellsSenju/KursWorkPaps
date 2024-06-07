@@ -12,6 +12,8 @@
 
 #include <QJsonObject>
 #include <QJsonDocument>
+#include <QTcpSocket>
+#include <QHostAddress>
 
 namespace stefanfrings {
 

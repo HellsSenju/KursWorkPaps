@@ -29,7 +29,13 @@ public slots:
     void startNewProcess(bool server, const QString &uuid, const QString &command);
     void stopProcess(const QString &uuid);
 
-    void onProcessStateChaned(const QString &uuid, ProcessState state);
+    void onProcessStateChaned(const QString uuid, ProcessState state);
+
+    void onStateChanged(ProcessState state);
+
+signals:
+    void iperfStarted(bool res);
+    void started();
 
 };
 

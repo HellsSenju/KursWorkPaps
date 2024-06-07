@@ -2,19 +2,16 @@
 #include <QDir>
 #include <QSettings>
 #include <QUuid>
-#include <QMetaType>
 
-#include "models/iperfserver.h"
 #include "httplistener.h"
 #include "global.h"
 #include "controllers/requestmapper.h"
-#include "models/abstractiperf.h"
 
 QString searchConfigFile()
 {
     QString binDir=QCoreApplication::applicationDirPath();
     QString appName=QCoreApplication::applicationName();
-    QString fileName("IperfManager.ini");
+    QString fileName("RestApi.ini");
 
     QStringList searchList;
     searchList.append(binDir);
@@ -48,9 +45,7 @@ QString searchConfigFile()
 int main(int argc, char *argv[])
 {
     QCoreApplication app(argc, argv);
-    app.setApplicationName("IperfManager");
-
-    qRegisterMetaType<ProcessState>();
+    app.setApplicationName("RestApi");
 
     // поиск конфигурационного файла
     QString configFileName=searchConfigFile();
@@ -76,8 +71,6 @@ int main(int argc, char *argv[])
     listenerSettings->beginGroup("listener");
     new HttpListener(listenerSettings, new RequestMapper(&app), &app);
 
-    // создание менеджера процессов iperf
-    manager = new IperfManager();
 
 //    qDebug() << QUuid::createUuid().toString();
 //    qDebug() << QUuid::createUuid().toString();
@@ -89,4 +82,3 @@ int main(int argc, char *argv[])
     app.exec();
     qWarning("Application has stopped");
 }
-

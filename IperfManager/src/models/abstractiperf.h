@@ -6,12 +6,16 @@
 #include <QProcess>
 #include <QDebug>
 #include <QUuid>
+#include <QString>
 
 enum ProcessState {Starting, Running, Finished, Crashed, FaledToStart};
+Q_DECLARE_METATYPE(ProcessState)
 
 class AbstractIperf : public QObject
 {
     Q_OBJECT
+    Q_PROPERTY(ProcessState state READ state WRITE setState NOTIFY stateChanged)
+
 public:
     virtual ~AbstractIperf() = default;
 
@@ -20,15 +24,17 @@ public:
     virtual void stop() = 0;
     virtual void waitForFinished(int sec = 30) = 0; //-1 - бесконечное ожидание
 
+    virtual QString getUuid(){
+        return uuid.toString();
+    };
+
 //    virtual bool finished(int exitCode);
 
 
 protected:
     QProcess *process = nullptr;
     QUuid uuid;
-
-//signals:
-//    virtual void processStateChaned(const QString &uuid, ProcessState state);
+    bool server;
 
 };
 

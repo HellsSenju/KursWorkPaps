@@ -105,7 +105,7 @@ void HttpConnectionHandler::handleConnection(tSocketDescriptor socketDescriptor)
     #endif
 
     // Start timer for read timeout
-    int readTimeout=settings->value("readTimeout",10000).toInt();
+    int readTimeout=settings->value("readTimeout", 10000).toInt();
     readTimer.start(readTimeout);
     // delete previous request
     delete currentRequest;

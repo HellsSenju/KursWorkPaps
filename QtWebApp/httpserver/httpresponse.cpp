@@ -85,7 +85,7 @@ bool HttpResponse::writeToSocket(QByteArray data)
             socket->waitForBytesWritten(-1);
         }
 
-        qint64 written=socket->write(ptr,remaining);
+        qint64 written = socket->write(ptr,remaining);
         if (written==-1)
         {
           return false;

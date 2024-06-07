@@ -11,10 +11,10 @@ OTHER_FILES += etc/* logs/* otherFiles/*
 SOURCES += \
     src/global.cpp \
     src/iperfmanager.cpp \
-    src/controllers/requestmapper.cpp \
     src/main.cpp \
     src/models/iperfclient.cpp \
     src/models/iperfserver.cpp \
+    src/controllers/requestmapper.cpp \
     src/controllers/startcontroller.cpp \
     src/controllers/statisticcontroller.cpp \
     src/controllers/stopcontroller.cpp \
@@ -28,10 +28,10 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 HEADERS += \
     src/global.h \
     src/iperfmanager.h \
-    src/controllers/requestmapper.h \
     src/models/abstractiperf.h \
     src/models/iperfclient.h \
     src/models/iperfserver.h \
+    src/controllers/requestmapper.h \
     src/controllers/startcontroller.h \
     src/controllers/statisticcontroller.h \
     src/controllers/stopcontroller.h \

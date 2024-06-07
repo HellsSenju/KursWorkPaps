@@ -4,6 +4,7 @@ IperfServer::IperfServer(QUuid processUuid)
 {
     process = new QProcess();
     uuid = processUuid;
+    server = true;
 
 //    process->setStandardOutputFile("../IperfManager/otherFiles/output.txt");
 
@@ -20,7 +21,7 @@ IperfServer::IperfServer(QUuid processUuid)
             break;
         case 1: //starting
             qDebug("IperfServer : stateChanged : %s : Процесс запускается, но программа еще не была вызвана", qPrintable(uuid.toString()));
-            emit processStateChaned(uuid.toString(), ProcessState::Starting);
+            emit processStateChaned(getUuid(), ProcessState::Starting);
             break;
         case 2: // running
 //            qDebug("stateChanged : %s : Процесс запущен и готов к чтению и записи", qPrintable(uuid.toString()));
@@ -33,12 +34,12 @@ IperfServer::IperfServer(QUuid processUuid)
         [=](int exitCode, QProcess::ExitStatus exitStatus)
     {
         qDebug("IperfServer : Процесс сервера(%s) завершился. exitCode: %i. exitStatus: %i.",
-               qPrintable(this->uuid.toString()),
+               qPrintable(getUuid()),
                exitCode,
                exitStatus
         );
 
-        emit processStateChaned(uuid.toString(), ProcessState::Finished);
+        emit processStateChaned(getUuid(), ProcessState::Finished);
     });
 }
 
@@ -56,7 +57,7 @@ void IperfServer::setParams(const QString &program, const QStringList &args)
 void IperfServer::start()
 {
     process->start();
-    process->waitForReadyRead();
+//    process->waitForReadyRead(-1);
 }
 
 void IperfServer::stop()

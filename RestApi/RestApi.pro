@@ -1,20 +1,20 @@
+TARGET = RestApi
+TEMPLATE = app
 QT -= gui
-QT += network core
-
+QT += core network
 
 CONFIG += c++11 console
 CONFIG -= app_bundle
 
-# You can make your code fail to compile if it uses deprecated APIs.
-# In order to do so, uncomment the following line.
-#DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
+OTHER_FILES += etc/* logs/*
 
 SOURCES += \
-        abstractrestserver.cpp \
-        api.cpp \
-        iperfserver.cpp \
-        main.cpp \
-        workerthread.cpp
+        src/controllers/startiperfcontroller.cpp \
+        src/main.cpp\
+        src/global.cpp \
+        src/controllers/requestmapper.cpp \
+        src/controllers/testcontroller.cpp
+
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
@@ -22,8 +22,16 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 HEADERS += \
-    abstractiperf.h \
-    abstractrestserver.h \
-    api.h \
-    iperfserver.h \
-    workerthread.h
+        src/controllers/startiperfcontroller.h \
+        src/global.h \
+        src/controllers/requestmapper.h \
+        src/controllers/testcontroller.h
+
+include(../QtWebApp/httpserver/httpserver.pri)
+include(../QtWebApp/logging/logging.pri)
+
+
+# Not used: include(QtWebApp/templateengine/templateengine.pri)
+
+DISTFILES += \
+    logs/uuids
