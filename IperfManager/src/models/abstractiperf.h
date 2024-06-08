@@ -14,7 +14,6 @@ Q_DECLARE_METATYPE(ProcessState)
 class AbstractIperf : public QObject
 {
     Q_OBJECT
-    Q_PROPERTY(ProcessState state READ state WRITE setState NOTIFY stateChanged)
 
 public:
     virtual ~AbstractIperf() = default;
@@ -28,6 +27,14 @@ public:
         return uuid.toString();
     };
 
+    virtual const char* getUuidChar(){
+        return qPrintable(uuid.toString());
+    };
+
+    virtual bool isStarted(){
+        return started;
+    }
+
 //    virtual bool finished(int exitCode);
 
 
@@ -35,6 +42,7 @@ protected:
     QProcess *process = nullptr;
     QUuid uuid;
     bool server;
+    bool started = false;
 
 };
 

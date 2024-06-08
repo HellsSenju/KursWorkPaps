@@ -16,10 +16,7 @@ void StartController::service(HttpRequest &request, HttpResponse &response)
         QTimer timer;
         timer.setSingleShot(true);
         QEventLoop loop;
-        bool started = false;
-        connect( manager, &IperfManager::iperfStarted, this, [=](bool res) mutable {
-            started = res;
-        });
+
         connect( manager, &IperfManager::iperfStarted, &loop, &QEventLoop::quit);
         connect( &timer, &QTimer::timeout, &loop, &QEventLoop::quit );
 
@@ -29,7 +26,9 @@ void StartController::service(HttpRequest &request, HttpResponse &response)
 
         loop.exec();
 
+        bool started = manager->getProcessStartStatus(body["uuid"].toString());
         if(timer.isActive() && started){
+
             response.setStatus(200, "Ok");
             response.setHeader("Content-Type", "application/json");
             QJsonObject object{
@@ -39,6 +38,8 @@ void StartController::service(HttpRequest &request, HttpResponse &response)
             response.write(QJsonDocument(object).toJson(QJsonDocument::Compact),true);
         }
         else if(timer.isActive() && !started){
+            qDebug() << "3";
+            qDebug() << started;
             response.setStatus(200, "Ok");
             response.setHeader("Content-Type", "application/json");
             QJsonObject object{

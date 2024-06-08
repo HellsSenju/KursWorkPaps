@@ -19,6 +19,11 @@ IperfManager::~IperfManager()
     }
 }
 
+bool IperfManager::getProcessStartStatus(QString uuid)
+{
+    return pool.value(uuid)->isStarted();
+}
+
 void IperfManager::startNewProcess(bool server, const QString &uuid, const QString &command)
 {
     qDebug("IperfManager : startNewProcess : %s", qPrintable(command));
@@ -30,16 +35,17 @@ void IperfManager::startNewProcess(bool server, const QString &uuid, const QStri
         connect(qobject_cast<IperfServer*>(iperf),
                 &IperfServer::stateChanged,
                 this,
-                &IperfManager::onProcessStateChaned);
+                &IperfManager::onStateChanged);
     }
 //    else
 //        iperf = new IperfClient(uuid);
 
 
     pool.insert(uuid, iperf);
+    qDebug() << "startNewProcess, size" << pool.size();
+    qDebug() << "startNewProcess, object" << pool[uuid];
 
     iperf->setParams("iperf", command.split(' '));
-
     iperf->start();
 }
 
@@ -89,7 +95,54 @@ void IperfManager::onProcessStateChaned(const QString uuid, ProcessState state)
 
 void IperfManager::onStateChanged(ProcessState state)
 {
-    AbstractIperf* iperf = qobject_cast<AbstractIperf*>(sender());
+    QObject *p = sender();
+    AbstractIperf* iperf = qobject_cast<AbstractIperf*>(p);
+
+    qDebug() << iperf;
+
+    QMapIterator<QString, AbstractIperf*> i(pool);
+    while (i.hasNext()) {
+        i.next();
+        qDebug() << i.value()->getUuid();
+    }
+
+
+    switch (state) {
+    case ProcessState::Starting:
+//        qDebug("IperfManager : ProcessState::Starting : %s", iperf->getUuidChar());
+        break;
+
+    case ProcessState::Running:
+//        qDebug("IperfManager : ProcessState::Running : %s", iperf->getUuidChar());
+        emit iperfStarted(true);
+//        emit started();
+        break;
+
+    case ProcessState::Finished:
+    {
+//        disconnect(qobject_cast<IperfServer*>(deleted),
+//                &IperfServer::stateChanged,
+//                this,
+//                &IperfManager::onStateChanged);
+
+        pool.remove(iperf->getUuid());
+        iperf->deleteLater();
+        qDebug("IperfManager : onProcessStateChaned : %s удален из пула", iperf->getUuidChar());
+    }
+        break;
+
+    case ProcessState::Crashed:
+//        qDebug("IperfManager : ProcessState::Crashed : %s", iperf->getUuidChar());
+        break;
+
+    case ProcessState::FaledToStart:
+//        qDebug("IperfManager : ProcessState::FaledToStart : %s", iperf->getUuidChar());
+        emit iperfStarted(false);
+        break;
+
+    default:
+        break;
+    }
 
 
 }

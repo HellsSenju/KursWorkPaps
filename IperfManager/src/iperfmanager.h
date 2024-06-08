@@ -20,6 +20,8 @@ public:
     explicit IperfManager(QObject* parent=0);
     ~IperfManager();
 
+    bool getProcessStartStatus(QString uuid);
+
 private:
     QList<AbstractIperf*> iperfsPool;
     QMap<QString, AbstractIperf*> pool;
