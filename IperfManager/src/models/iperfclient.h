@@ -1,27 +1,31 @@
-//#ifndef IPERFCLIENT_H
-//#define IPERFCLIENT_H
+#ifndef IPERFCLIENT_H
+#define IPERFCLIENT_H
 
-//#include "abstractiperf.h"
+#include "abstractiperf.h"
 
-//class IperfClient : public AbstractIperf
-//{
-//    Q_OBJECT
+class IperfClient : public AbstractIperf
+{
+    Q_OBJECT
 
-//public:
-//    IperfClient(QUuid processUuid);
-//    ~IperfClient();
+public:
+    explicit IperfClient(QUuid processUuid);
+    ~IperfClient();
 
-//    void setParams(const QString &program, const QStringList &args);
-//    void start();
-//    void stop();
-//    void waitForFinished(int sec = 30);
+    void setParams(const QString &program, const QStringList &args);
+    void start();
+    void stop();
+    void waitForFinished(int sec = 30);
 
-//private slots:
-//    void standartOutput();
-//    void errorOccurred();
-//    void standartError();
-//    bool started();
+private slots:
+    void onStandartOutput();
+    void onErrorOccurred(QProcess::ProcessError error);
+    void onStandartError();
+    void onStarted();
 
-//};
+signals:
+    void processStateChaned(const QString uuid, ProcessState state);
 
-//#endif // IPERFCLIENT_H
+    void stateChanged(ProcessState state);
+};
+
+#endif // IPERFCLIENT_H

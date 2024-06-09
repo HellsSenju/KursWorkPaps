@@ -24,9 +24,6 @@ private slots:
     void onStarted();
 
 signals:
-//    void started(const QString &uuid);
-//    void finished(const QString &uuid)e;
-
     void processStateChaned(const QString uuid, ProcessState state);
 
     void stateChanged(ProcessState state);

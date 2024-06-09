@@ -37,13 +37,15 @@ void IperfManager::startNewProcess(bool server, const QString &uuid, const QStri
                 this,
                 &IperfManager::onStateChanged);
     }
-//    else
-//        iperf = new IperfClient(uuid);
-
+    else{
+        iperf = new IperfClient(uuid);
+        connect(qobject_cast<IperfClient*>(iperf),
+                &IperfClient::stateChanged,
+                this,
+                &IperfManager::onStateChanged);
+    }
 
     pool.insert(uuid, iperf);
-    qDebug() << "startNewProcess, size" << pool.size();
-    qDebug() << "startNewProcess, object" << pool[uuid];
 
     iperf->setParams("iperf", command.split(' '));
     iperf->start();
@@ -69,7 +71,7 @@ void IperfManager::onProcessStateChaned(const QString uuid, ProcessState state)
         break;
     case ProcessState::Finished:
     {
-        AbstractIperf *deleted = pool[uuid];
+        AbstractIperf *deleted = pool.value(uuid);
 
         disconnect(qobject_cast<IperfServer*>(deleted),
                 &IperfServer::processStateChaned,
@@ -98,15 +100,6 @@ void IperfManager::onStateChanged(ProcessState state)
     QObject *p = sender();
     AbstractIperf* iperf = qobject_cast<AbstractIperf*>(p);
 
-    qDebug() << iperf;
-
-    QMapIterator<QString, AbstractIperf*> i(pool);
-    while (i.hasNext()) {
-        i.next();
-        qDebug() << i.value()->getUuid();
-    }
-
-
     switch (state) {
     case ProcessState::Starting:
 //        qDebug("IperfManager : ProcessState::Starting : %s", iperf->getUuidChar());
@@ -120,10 +113,15 @@ void IperfManager::onStateChanged(ProcessState state)
 
     case ProcessState::Finished:
     {
-//        disconnect(qobject_cast<IperfServer*>(deleted),
-//                &IperfServer::stateChanged,
-//                this,
-//                &IperfManager::onStateChanged);
+        disconnect(qobject_cast<IperfServer*>(p),
+                &IperfServer::stateChanged,
+                this,
+                &IperfManager::onStateChanged);
+
+        disconnect(qobject_cast<IperfClient*>(p),
+                &IperfClient::stateChanged,
+                this,
+                &IperfManager::onStateChanged);
 
         pool.remove(iperf->getUuid());
         iperf->deleteLater();
