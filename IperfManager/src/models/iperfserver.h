@@ -10,23 +10,18 @@ class IperfServer : public AbstractIperf
 
 public:
     explicit IperfServer(QUuid processUuid);
-    ~IperfServer();
+    ~IperfServer() override;
 
-    void setParams(const QString &program, const QStringList &args);
-    void start();
-    void stop();
-    void waitForFinished(int sec = 30);
+    void setParams(const QString &program, const QStringList &args) override;
+    void start() override;
+    void stop() override;
+    void waitForFinished(int sec = 30) override;
 
 private slots:
     void onStandartOutput();
     void onErrorOccurred(QProcess::ProcessError error);
     void onStandartError();
     void onStarted();
-
-signals:
-    void processStateChaned(const QString uuid, ProcessState state);
-
-    void stateChanged(ProcessState state);
 
 };
 

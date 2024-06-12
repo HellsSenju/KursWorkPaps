@@ -9,12 +9,12 @@ class IperfClient : public AbstractIperf
 
 public:
     explicit IperfClient(QUuid processUuid);
-    ~IperfClient();
+    ~IperfClient() override;
 
-    void setParams(const QString &program, const QStringList &args);
-    void start();
-    void stop();
-    void waitForFinished(int sec = 30);
+    void setParams(const QString &program, const QStringList &args) override;
+    void start() override;
+    void stop() override;
+    void waitForFinished(int sec = 30) override;
 
 private slots:
     void onStandartOutput();
@@ -22,10 +22,6 @@ private slots:
     void onStandartError();
     void onStarted();
 
-signals:
-    void processStateChaned(const QString uuid, ProcessState state);
-
-    void stateChanged(ProcessState state);
 };
 
 #endif // IPERFCLIENT_H

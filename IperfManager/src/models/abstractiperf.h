@@ -35,6 +35,10 @@ public:
         return started;
     }
 
+    virtual bool isServer(){
+        return server;
+    }
+
 //    virtual bool finished(int exitCode);
 
 
@@ -43,6 +47,9 @@ protected:
     QUuid uuid;
     bool server;
     bool started = false;
+
+signals:
+    void stateChanged(ProcessState state);
 
 };
 
