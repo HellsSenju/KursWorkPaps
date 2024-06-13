@@ -17,6 +17,7 @@
 #include <QString>
 #include <QStringList>
 #include <QEventLoop>
+#include <QObject>
 
 namespace stefanfrings {
 

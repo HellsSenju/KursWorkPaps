@@ -24,7 +24,7 @@ void ProcessesPool::execute(const QString &uuid, const QString &command)
 
     pool.insert(uuid, process);
 
-    process->setParams("sudo /usr/sbin/tc", command.split(' '));
+    process->setParams("/usr/sbin/tc", command.split(' '));
     process->execute();
 }
 

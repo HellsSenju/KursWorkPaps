@@ -4,8 +4,6 @@
 #include "httprequesthandler.h"
 #include "../global.h"
 
-#include <QObject>
-#include <QEventLoop>
 
 using namespace stefanfrings;
 

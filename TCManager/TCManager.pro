@@ -11,6 +11,7 @@ OTHER_FILES += etc/* logs/*
 
 SOURCES += \
     src/controllers/addcontroller.cpp \
+    src/controllers/getcontroller.cpp \
     src/global.cpp \
     src/controllers/requestmapper.cpp \
     src/controllers/testcontroller.cpp \
@@ -25,6 +26,7 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 
 HEADERS += \
     src/controllers/addcontroller.h \
+    src/controllers/getcontroller.h \
     src/global.h \
     src/controllers/requestmapper.h \
     src/controllers/testcontroller.h \
