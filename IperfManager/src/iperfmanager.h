@@ -20,10 +20,11 @@ public:
     explicit IperfManager(QObject* parent=0);
     ~IperfManager();
 
-    bool getProcessStartStatus(QString uuid);
+    bool getProcessStartStatus(const QString &uuid){
+        return pool.value(uuid)->isStarted();
+    };
 
 private:
-    QList<AbstractIperf*> iperfsPool;
     QMap<QString, AbstractIperf*> pool;
 
 

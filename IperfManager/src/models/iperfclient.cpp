@@ -83,7 +83,7 @@ void IperfClient::onErrorOccurred(QProcess::ProcessError error)
         break;
 
     case 1:
-        qDebug("IperfClient : errorOccurred : %s : FailedToStart", qPrintable(uuid.toString()));
+        qDebug("IperfClient : errorOccurred : %s : Crashed", qPrintable(uuid.toString()));
         break;
 
     case 2:

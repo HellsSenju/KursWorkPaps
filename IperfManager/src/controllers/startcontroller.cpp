@@ -9,19 +9,6 @@ void StartController::service(HttpRequest &request, HttpResponse &response)
     qDebug() << request.getBody();
     QJsonObject req =  parseRequest(request.getBody());
 
-    if(!req.contains("server") && !req.contains("client")){
-        //406 Not Acceptable — запрошенный URI не может удовлетворить переданным в заголовке характеристикам.
-        //Если метод был не HEAD, то сервер должен вернуть список допустимых характеристик для данного ресурса.
-        response.setStatus(400, "Некорректный запрос");
-        response.setHeader("Content-Type", "application/json");
-
-        QJsonObject object{
-            {"Запросы : ", " тут запросы"}
-        };
-
-        response.write(QJsonDocument(object).toJson(QJsonDocument::Compact),true);
-    }
-
     bool isServer;
     QJsonObject body;
     if(req.contains("server")){
@@ -67,10 +54,10 @@ void StartController::service(HttpRequest &request, HttpResponse &response)
         response.write(QJsonDocument(object).toJson(QJsonDocument::Compact),true);
     }
     else{
-        response.setStatus(500, "Internal Server Error");
+        response.setStatus(200, "Ok");
         response.setHeader("Content-Type", "application/json");
         QJsonObject object{
-            {"iperf_manager", "Сигнал от процесса не был получен."}
+            {"iperf_manager", "Сигнал от процесса не был получен. Процесс не выполнился"}
         };
 
         response.write(QJsonDocument(object).toJson(QJsonDocument::Compact),true);

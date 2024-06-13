@@ -47,7 +47,10 @@ QString searchConfigFile()
 int main(int argc, char *argv[])
 {
     QCoreApplication app(argc, argv);
-    app.setApplicationName("IperfManager");
+    app.setApplicationName("TCManager");
+
+    // регистрация пользовательского типа
+    qRegisterMetaType<ProcessState>();
 
     // поиск конфигурационного файла
     QString configFileName=searchConfigFile();

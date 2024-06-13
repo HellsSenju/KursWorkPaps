@@ -2,37 +2,67 @@
 
 AddController::AddController()
 {
-    connect(this, &AddController::addRule, pool, &ProcessesPool::onAddRule);
 }
 
 void AddController::service(HttpRequest &request, HttpResponse &response)
 {
     qDebug() << request.getBody();
-    QJsonObject req =  parseRequest(request.getBody());
+    QJsonObject body =  parseRequest(request.getBody());
 
-    if(req.contains("server")){
-        QJsonObject body = req["server"].toObject();
 
-        emit addRule(body["uuid"].toString(), body["command"].toString());
+    QTimer timer;
+    timer.setSingleShot(true);
+    QEventLoop loop;
 
-        response.setStatus(200,"Ok");
-        response.setHeader("Content-Type", "application/json");
+    connect( pool, &ProcessesPool::executed, &loop, &QEventLoop::quit);
+    connect( &timer, &QTimer::timeout, &loop, &QEventLoop::quit );
 
-//        QJsonObject object{
-//            {"response", "ляяяяяяяяяяя работает"}
-//        };
+    timer.start(10000); //10 sec
 
-//        response.write(QJsonDocument(object).toJson(QJsonDocument::Compact), true);
-    }
+    pool->execute(body["uuid"].toString(), body["command"].toString());
 
-    else{
-        response.setStatus(400, "неправильный, некорректный запрос");
-        response.setHeader("Content-Type", "application/json");
+    loop.exec();
 
+    response.setStatus(200,"Ok");
+    response.setHeader("Content-Type", "application/json");
+
+    switch (pool->getProcessState(body["uuid"].toString())) {
+    case ProcessState::Finished:
+    {
         QJsonObject object{
-            {"response", "ляяяяяяяяяяя работает - 400"}
+            {"TCManager", "Finished"}
         };
 
         response.write(QJsonDocument(object).toJson(QJsonDocument::Compact), true);
+     }
+        break;
+
+    case ProcessState::Crashed:
+    {
+        QJsonObject object{
+            {"TCManager", "Crashed"}
+        };
+
+        response.write(QJsonDocument(object).toJson(QJsonDocument::Compact), true);
+    }
+        break;
+
+    case ProcessState::FailedToStart:
+    {
+        QJsonObject object{
+            {"TCManager", "FailedToStart"}
+        };
+
+        response.write(QJsonDocument(object).toJson(QJsonDocument::Compact), true);
+    }
+        break;
+
+    default:
+        QJsonObject object{
+            {"TCManager", "default"}
+        };
+
+        response.write(QJsonDocument(object).toJson(QJsonDocument::Compact), true);
+        break;
     }
 }

@@ -1,11 +1,11 @@
-#include "startiperfcontroller.h"
+#include "stopiperfcontroller.h"
 
-StartIperfController::StartIperfController()
+StopIperfController::StopIperfController()
 {
 
 }
 
-void StartIperfController::service(HttpRequest &request, HttpResponse &response)
+void StopIperfController::service(HttpRequest &request, HttpResponse &response)
 {
     qDebug() << request.getBody();
     QByteArray body = request.getBody();
@@ -20,17 +20,6 @@ void StartIperfController::service(HttpRequest &request, HttpResponse &response)
         if(socket->waitForConnected()){
             qDebug("Connected!");
 
-//            QString str = "";
-//            str.append("POST /start HTTP/1.1 \r\n ");
-//            str.append(QString("Host: %1:%2 \r\n").arg(8081).arg("localhost"));
-//            str.append(QString("Content-Length: %1 \r\n ").
-//                       arg(body.length()));
-//            str.append("Content-Type: application/json \r\n ");
-//            str.append("Connection: keep-alive \r\n ");
-//            str.append("\r\n");
-//            str.append(body.data());
-//            str.append("\r\n");
-
             QByteArray toSend = configureRequest("localhost", 8081, body);
 
             socket->write(toSend.data(), toSend.length());
@@ -41,9 +30,6 @@ void StartIperfController::service(HttpRequest &request, HttpResponse &response)
 
             QString resStatus = fromIperf.split("\r\n").at(0).split(" ").at(1);
             QString resBody = fromIperf.split("\r\n").at(4);
-
-//            qDebug() << resStatus;
-//            qDebug() << resBody;
 
             if(resStatus == "200"){
                 response.setStatus(200,"Ok");

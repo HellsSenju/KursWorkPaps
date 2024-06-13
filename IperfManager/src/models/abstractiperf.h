@@ -8,7 +8,7 @@
 #include <QUuid>
 #include <QString>
 
-enum ProcessState {Starting, Running, Finished, Crashed, FaledToStart};
+enum ProcessState {Starting, Running, Finished, Crashed, FailedToStart};
 Q_DECLARE_METATYPE(ProcessState)
 
 class AbstractIperf : public QObject

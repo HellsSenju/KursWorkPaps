@@ -27,7 +27,6 @@ HEADERS += \
     src/controllers/addcontroller.h \
     src/global.h \
     src/controllers/requestmapper.h \
-    src/controllers/startcontroller.h \
     src/controllers/testcontroller.h \
     src/processespool.h \
     src/models/tcprocess.h

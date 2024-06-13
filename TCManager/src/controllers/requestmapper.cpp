@@ -1,8 +1,8 @@
 #include "requestmapper.h"
 #include "../global.h"
 #include "testcontroller.h"
-#include "startcontroller.h"
 #include "statisticcontroller.h"
+#include "addcontroller.h"
 
 RequestMapper::RequestMapper(QObject* parent)
     :HttpRequestHandler(parent)
@@ -23,14 +23,10 @@ void RequestMapper::service(HttpRequest& request, HttpResponse& response)
     HttpSession session = sessionStore->getSession(request, response);
     qDebug("RequestMapper: sessionId = %s", session.getId().data());
 
-    if (path.startsWith("/start"))
-    {
-        StartController().service(request, response);
-    }
 
-    else if (path.startsWith("/stop"))
+    if (path.startsWith("/add"))
     {
-        StopController().service(request, response);
+        AddController().service(request, response);
     }
     // All other pathes are mapped to the static file controller.
     // In this case, a single instance is used for multiple requests.

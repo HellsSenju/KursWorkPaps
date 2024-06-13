@@ -17,8 +17,6 @@ public:
     AddController();
     void service(HttpRequest& request, HttpResponse& response);
 
-signals:
-    void addRule(const QString &uuid, const QString &command);
 };
 
 #endif // ADDCONTROLLER_H

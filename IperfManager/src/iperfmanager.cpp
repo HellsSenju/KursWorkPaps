@@ -8,9 +8,6 @@ IperfManager::IperfManager(QObject *parent)
 
 IperfManager::~IperfManager()
 {
-    for(AbstractIperf* iperf : iperfsPool)
-        iperf->deleteLater();
-
     QMapIterator<QString, AbstractIperf*> i(pool);
     while (i.hasNext()) {
         i.next();
@@ -19,10 +16,6 @@ IperfManager::~IperfManager()
     }
 }
 
-bool IperfManager::getProcessStartStatus(QString uuid)
-{
-    return pool.value(uuid)->isStarted();
-}
 
 void IperfManager::startNewProcess(bool server, const QString &uuid, const QString &command)
 {
@@ -32,17 +25,9 @@ void IperfManager::startNewProcess(bool server, const QString &uuid, const QStri
 
     if(server){
         iperf = new IperfServer(uuid);
-//        connect(qobject_cast<IperfServer*>(iperf),
-//                &IperfServer::stateChanged,
-//                this,
-//                &IperfManager::onStateChanged);
     }
     else{
         iperf = new IperfClient(uuid);
-//        connect(qobject_cast<IperfClient*>(iperf),
-//                &IperfClient::stateChanged,
-//                this,
-//                &IperfManager::onStateChanged);
     }
 
     connect(iperf,
@@ -82,14 +67,6 @@ void IperfManager::onStateChanged(ProcessState state)
         disconnect(iperf, &AbstractIperf::stateChanged,
                     this, &IperfManager::onStateChanged);
 
-//        if(iperf->isServer())
-//            disconnect(qobject_cast<IperfServer*>(p), &IperfServer::stateChanged,
-//                        this, &IperfManager::onStateChanged);
-
-//        else
-//            disconnect(qobject_cast<IperfClient*>(p), &IperfClient::stateChanged,
-//                        this, &IperfManager::onStateChanged);
-
         pool.remove(iperf->getUuid());
         iperf->deleteLater();
         qDebug("IperfManager : onProcessStateChaned : %s удален из пула", iperf->getUuidChar());
@@ -99,7 +76,7 @@ void IperfManager::onStateChanged(ProcessState state)
     case ProcessState::Crashed:
         break;
 
-    case ProcessState::FaledToStart:
+    case ProcessState::FailedToStart:
         emit iperfStarted();
         break;
 

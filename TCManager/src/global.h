@@ -14,7 +14,6 @@ using namespace stefanfrings;
   of this project.
 */
 
-
 /** Storage for session cookies */
 extern  HttpSessionStore* sessionStore;
 
