@@ -12,9 +12,11 @@ OTHER_FILES += etc/* logs/*
 SOURCES += \
     src/controllers/addcontroller.cpp \
     src/controllers/getcontroller.cpp \
+    src/controllers/getinterfacescontroller.cpp \
     src/global.cpp \
     src/controllers/requestmapper.cpp \
     src/controllers/testcontroller.cpp \
+    src/models/process.cpp \
     src/processespool.cpp \
     src/models/tcprocess.cpp \
     src/main.cpp
@@ -27,9 +29,12 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 HEADERS += \
     src/controllers/addcontroller.h \
     src/controllers/getcontroller.h \
+    src/controllers/getinterfacescontroller.h \
     src/global.h \
     src/controllers/requestmapper.h \
     src/controllers/testcontroller.h \
+    src/models/abstractprocess.h \
+    src/models/process.h \
     src/processespool.h \
     src/models/tcprocess.h
 

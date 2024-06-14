@@ -1,7 +1,6 @@
 #include "tcprocess.h"
 
-TCProcess::TCProcess(QUuid processUuid, QObject *parent)
-    : QObject{parent}
+TCProcess::TCProcess(QUuid processUuid)
 {
     process = new QProcess();
     uuid = processUuid;

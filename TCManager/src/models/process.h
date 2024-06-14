@@ -1,15 +1,17 @@
-#ifndef TCPROCESS_H
-#define TCPROCESS_H
+#ifndef PROCESS_H
+#define PROCESS_H
 
 #include "abstractprocess.h"
 
-class TCProcess : public AbstractProcess
+class Process : public AbstractProcess
 {
     Q_OBJECT
-public:
-    explicit TCProcess(QUuid processUuid);
-    ~TCProcess();
 
+public:
+    explicit Process(QUuid processUuid);
+    ~ Process();
+
+public:
     void setParams(const QString &program, const QStringList &args);
     void execute();
     void stop();
@@ -18,7 +20,6 @@ private slots:
     void onStandartOutput();
     void onErrorOccurred(QProcess::ProcessError error);
     void onStandartError();
-
 };
 
-#endif // TCPROCESS_H
+#endif // PROCESS_H

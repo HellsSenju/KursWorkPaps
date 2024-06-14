@@ -8,7 +8,12 @@
 #include <QUuid>
 #include <QStringList>
 
+#include "./models/abstractprocess.h"
 #include "./models/tcprocess.h"
+#include "./models/process.h"
+
+enum Programs {TC, NMCLI};
+Q_DECLARE_METATYPE(Programs)
 
 class ProcessesPool : public QObject
 {
@@ -17,13 +22,18 @@ public:
     explicit ProcessesPool(QObject *parent = nullptr);
     ~ProcessesPool();
 
-    void execute(const QString &uuid, const QString &command);
+    void execute(const QString &uuid, Programs program, const QString &command);
+    void deleteProcess(const QString &uuid);
+
     ProcessState getProcessState(const QString& uuid){
         return pool.value(uuid)->getState();
     };
 
 private:
-    QMap<QString, TCProcess*> pool;
+    const QString tc = "tc";
+    const QString nmcli = "nmcli";
+
+    QMap<QString, AbstractProcess*> pool;
 
 public slots:
     void onStateChanged(ProcessState state);

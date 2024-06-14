@@ -1,13 +1,13 @@
-#include "getcontroller.h"
+#include "getinterfacescontroller.h"
 
-GetController::GetController()
+GetInterfacesController::GetInterfacesController()
 {
 
 }
 
-void GetController::service(HttpRequest &request, HttpResponse &response)
+void GetInterfacesController::service(HttpRequest &request, HttpResponse &response)
 {
-    qDebug() << request.getBody();
+    qDebug() << "GetInterfacesController : " << request.getBody();
     QJsonObject body =  parseRequest(request.getBody());
 
     QTimer timer;
@@ -19,7 +19,7 @@ void GetController::service(HttpRequest &request, HttpResponse &response)
 
     timer.start(10000); //10 sec
 
-    pool->execute(body["uuid"].toString(), Programs::TC, body["command"].toString());
+    pool->execute(body["uuid"].toString(), Programs::NMCLI, body["command"].toString());
 
     loop.exec();
 

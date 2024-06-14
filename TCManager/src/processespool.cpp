@@ -8,7 +8,7 @@ ProcessesPool::ProcessesPool(QObject *parent)
 
 ProcessesPool::~ProcessesPool()
 {
-    QMapIterator<QString, TCProcess*> i(pool);
+    QMapIterator<QString, AbstractProcess*> i(pool);
     while (i.hasNext()) {
         i.next();
         i.value()->stop();
@@ -16,41 +16,52 @@ ProcessesPool::~ProcessesPool()
     }
 }
 
-void ProcessesPool::execute(const QString &uuid, const QString &command)
+void ProcessesPool::execute(const QString &uuid, Programs program, const QString &command)
 {
-    TCProcess* process = new TCProcess(uuid);
-    connect(process, &TCProcess::stateChanged,
+    AbstractProcess* process = nullptr;
+    if(program == Programs::TC){
+        process = new TCProcess(uuid);
+        process->setParams(tc, command.split(' '));
+    }
+    else if(program == Programs::NMCLI){
+        process = new Process(uuid);
+        process->setParams(nmcli, command.split(' '));
+    }
+
+    connect(process, &AbstractProcess::stateChanged,
             this, &ProcessesPool::onStateChanged);
 
     pool.insert(uuid, process);
 
-    process->setParams("/usr/sbin/tc", command.split(' '));
     process->execute();
+}
+
+void ProcessesPool::deleteProcess(const QString &uuid)
+{
+    pool.value(uuid)->deleteLater();
+    pool.remove(uuid);
 }
 
 void ProcessesPool::onStateChanged(ProcessState state)
 {
     QObject *p = sender();
-    TCProcess* tc = qobject_cast<TCProcess*>(p);
+    AbstractProcess* process = qobject_cast<AbstractProcess*>(p);
 
 
     switch (state) {
     case ProcessState::Finished:
-        disconnect(tc, &TCProcess::stateChanged,
+        disconnect(process, &AbstractProcess::stateChanged,
                    this, &ProcessesPool::onStateChanged);
 
-//        pool.remove(tc->getUuid());
-//        tc->deleteLater();
-
-        qDebug("ProcessesPool : onProcessStateChaned : %s удален из пула", tc->getUuidChar());
+        qDebug("ProcessesPool : onProcessStateChaned : %s удален из пула", process->getUuidChar());
         break;
 
     case ProcessState::Crashed:
-        qDebug("ProcessesPool : onProcessStateChaned : %s crashed", tc->getUuidChar());
+        qDebug("ProcessesPool : onProcessStateChaned : %s crashed", process->getUuidChar());
         break;
 
     case ProcessState::FailedToStart:
-        qDebug("ProcessesPool : onProcessStateChaned : %s failed to start", tc->getUuidChar());
+        qDebug("ProcessesPool : onProcessStateChaned : %s failed to start", process->getUuidChar());
         break;
 
     default:
