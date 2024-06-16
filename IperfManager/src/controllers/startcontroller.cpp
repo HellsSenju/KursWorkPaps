@@ -24,42 +24,84 @@ void StartController::service(HttpRequest &request, HttpResponse &response)
     timer.setSingleShot(true);
     QEventLoop loop;
 
-    connect( manager, &IperfManager::iperfStarted, &loop, &QEventLoop::quit);
+    connect( manager, &IperfManager::iperfChanged, &loop, &QEventLoop::quit);
     connect( &timer, &QTimer::timeout, &loop, &QEventLoop::quit );
 
     timer.start(10000); //10 sec
 
-    manager->startNewProcess(isServer, body["uuid"].toString(), body["command"].toString());
+    if(!manager->startNewProcess(isServer, body["uuid"].toString(), body["command"].toString())){
+        QJsonObject object{
+            {"IperfManager", "Процесса с таким идентификатором уже существует."}
+        };
+
+        response.write(QJsonDocument(object).toJson(QJsonDocument::Compact),true);
+    }
 
     loop.exec();
 
-    bool started = manager->getProcessStartStatus(body["uuid"].toString());
-    if(timer.isActive() && started){
-
-        response.setStatus(200, "Ok");
-        response.setHeader("Content-Type", "application/json");
+    if(!timer.isActive()){
         QJsonObject object{
-            {"iperf_manager", "Процесс успешно запущен"}
+            {"IperfManager", "Процесс не был запущен (не поступил сигнал). Возможна ошибка в команде."}
         };
 
         response.write(QJsonDocument(object).toJson(QJsonDocument::Compact),true);
     }
-    else if(timer.isActive() && !started){
-        response.setStatus(200, "Ok");
-        response.setHeader("Content-Type", "application/json");
+
+//    response.setStatus(200, "Ok");
+//    response.setHeader("Content-Type", "application/json");
+//    QJsonObject object{
+//        {"IperfManager", "Процесс успешно запустился."}
+//    };
+
+//    response.write(QJsonDocument(object).toJson(QJsonDocument::Compact), true);
+
+    switch (manager->getProcessStatus(body["uuid"].toString())) {
+    case ProcessState::Running:
+    {
         QJsonObject object{
-            {"iperf_manager", "Процесс по некоторым причинал не смог запуститься"}
+            {"IperfManager", "Процесс успешно запустился."}
         };
 
-        response.write(QJsonDocument(object).toJson(QJsonDocument::Compact),true);
+        response.write(QJsonDocument(object).toJson(QJsonDocument::Compact), true);
+     }
+        break;
+
+    case ProcessState::Finished:
+    {
+        QJsonObject object{
+            {"IperfManager", "Процесс быстро заврешился. Возможна ошибка в команде."}
+        };
+
+        response.write(QJsonDocument(object).toJson(QJsonDocument::Compact), true);
+     }
+        break;
+
+    case ProcessState::Crashed:
+    {
+        QJsonObject object{
+            {"IperfManager", "Процесс завершился сбоем через некоторое время после успешного запуска."}
+        };
+
+        response.write(QJsonDocument(object).toJson(QJsonDocument::Compact), true);
     }
-    else{
-        response.setStatus(200, "Ok");
-        response.setHeader("Content-Type", "application/json");
+        break;
+
+    case ProcessState::FailedToStart:
+    {
         QJsonObject object{
-            {"iperf_manager", "Сигнал от процесса не был получен. Процесс не выполнился"}
+            {"IperfManager", "Не удалось запустить процесс. Либо запущенная программа отсутствует, либо у вас недостаточно прав для ее запуска."}
         };
 
-        response.write(QJsonDocument(object).toJson(QJsonDocument::Compact),true);
+        response.write(QJsonDocument(object).toJson(QJsonDocument::Compact), true);
+    }
+        break;
+
+    default:
+        QJsonObject object{
+            {"IperfManager", "Неизвестая ошибка. Попробуйте запустить еще раз"}
+        };
+
+        response.write(QJsonDocument(object).toJson(QJsonDocument::Compact), true);
+        break;
     }
 }

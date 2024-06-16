@@ -19,7 +19,7 @@ IperfClient::IperfClient(QUuid processUuid)
             break;
         case 1: //starting
             qDebug("IperfClient : Процесс запускается, но программа еще не была вызвана %s", qPrintable(uuid.toString()));
-            emit stateChanged(ProcessState::Starting);
+            setState(ProcessState::Starting);
             break;
         case 2: // running
 //            qDebug("stateChanged : %s : Процесс запущен и готов к чтению и записи", qPrintable(uuid.toString()));
@@ -37,7 +37,7 @@ IperfClient::IperfClient(QUuid processUuid)
                exitStatus
         );
 
-        emit stateChanged(ProcessState::Finished);
+        setState(ProcessState::Finished);
     });
 }
 
@@ -116,6 +116,5 @@ void IperfClient::onStandartError()
 void IperfClient::onStarted()
 {
     qDebug("IperfClient : Процесс запущен и готов к чтению и записи %s", qPrintable(uuid.toString()));
-    started = true;
-    emit stateChanged(ProcessState::Running);
+    setState(ProcessState::Running);
 }

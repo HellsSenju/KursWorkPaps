@@ -13,8 +13,7 @@ SOURCES += \
         src/controllers/stopiperfcontroller.cpp \
         src/main.cpp\
         src/global.cpp \
-        src/controllers/requestmapper.cpp \
-        src/controllers/testcontroller.cpp
+        src/controllers/requestmapper.cpp
 
 
 # Default rules for deployment.
@@ -26,8 +25,7 @@ HEADERS += \
         src/controllers/startiperfcontroller.h \
         src/controllers/stopiperfcontroller.h \
         src/global.h \
-        src/controllers/requestmapper.h \
-        src/controllers/testcontroller.h
+        src/controllers/requestmapper.h
 
 include(../QtWebApp/httpserver/httpserver.pri)
 include(../QtWebApp/logging/logging.pri)

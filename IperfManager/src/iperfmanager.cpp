@@ -16,10 +16,12 @@ IperfManager::~IperfManager()
     }
 }
 
-
-void IperfManager::startNewProcess(bool server, const QString &uuid, const QString &command)
+bool IperfManager::startNewProcess(bool server, const QString &uuid, const QString &command)
 {
     qDebug("IperfManager : startNewProcess : %s", qPrintable(command));
+
+    if(pool.contains(uuid))
+        return false;
 
     AbstractIperf* iperf = nullptr;
 
@@ -39,15 +41,25 @@ void IperfManager::startNewProcess(bool server, const QString &uuid, const QStri
 
     iperf->setParams("iperf", command.split(' '));
     iperf->start();
+    return true;
 }
 
-void IperfManager::stopProcess(const QString &uuid)
+bool IperfManager::stopProcess(const QString &uuid)
 {
-    qDebug("IperfManager : stopProcess : %s", qPrintable(uuid));
+    qDebug("IperfManager : остановка процесса : %s", qPrintable(uuid));
+    if(!pool.contains(uuid))
+        return false;
 
-    pool[uuid]->stop();
+    pool.value(uuid)->stop();
+    return true;
 }
 
+void IperfManager::deleteProcess(const QString &uuid)
+{
+    pool.value(uuid)->deleteLater();
+    pool.remove(uuid);
+    qDebug("IperfManager : onProcessStateChaned : %s удален из пула", qPrintable(uuid));
+}
 
 void IperfManager::onStateChanged(ProcessState state)
 {
@@ -59,7 +71,7 @@ void IperfManager::onStateChanged(ProcessState state)
         break;
 
     case ProcessState::Running:
-        emit iperfStarted();
+        emit iperfChanged();
         break;
 
     case ProcessState::Finished:
@@ -67,9 +79,7 @@ void IperfManager::onStateChanged(ProcessState state)
         disconnect(iperf, &AbstractIperf::stateChanged,
                     this, &IperfManager::onStateChanged);
 
-        pool.remove(iperf->getUuid());
-        iperf->deleteLater();
-        qDebug("IperfManager : onProcessStateChaned : %s удален из пула", iperf->getUuidChar());
+        emit iperfChanged();
     }
         break;
 
@@ -77,12 +87,7 @@ void IperfManager::onStateChanged(ProcessState state)
         break;
 
     case ProcessState::FailedToStart:
-        emit iperfStarted();
-        break;
-
-    default:
+        emit iperfChanged();
         break;
     }
-
-
 }

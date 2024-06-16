@@ -3,6 +3,7 @@
 #include <QSettings>
 #include <QUuid>
 #include <QMetaType>
+#include <csignal>
 
 #include "models/iperfserver.h"
 #include "httplistener.h"
@@ -47,6 +48,16 @@ QString searchConfigFile()
 
 int main(int argc, char *argv[])
 {
+    auto sig_handler = [](int sigcode)
+                           {
+                               qDebug() << QString("signal %1 was send").arg(sigcode);
+                               qApp->exit(sigcode);
+                           };
+
+    ::signal(SIGHUP,  sig_handler);
+    ::signal(SIGINT,  sig_handler);
+    ::signal(SIGPIPE,  sig_handler);
+
     QCoreApplication app(argc, argv);
     app.setApplicationName("IperfManager");
 

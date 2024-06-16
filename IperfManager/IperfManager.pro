@@ -17,8 +17,7 @@ SOURCES += \
     src/controllers/requestmapper.cpp \
     src/controllers/startcontroller.cpp \
     src/controllers/statisticcontroller.cpp \
-    src/controllers/stopcontroller.cpp \
-    src/controllers/testcontroller.cpp
+    src/controllers/stopcontroller.cpp
 
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
@@ -34,8 +33,7 @@ HEADERS += \
     src/controllers/requestmapper.h \
     src/controllers/startcontroller.h \
     src/controllers/statisticcontroller.h \
-    src/controllers/stopcontroller.h \
-    src/controllers/testcontroller.h
+    src/controllers/stopcontroller.h
 
 include(../QtWebApp/httpserver/httpserver.pri)
 include(../QtWebApp/logging/logging.pri)

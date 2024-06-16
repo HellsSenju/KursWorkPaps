@@ -4,8 +4,6 @@
 #include "httprequesthandler.h"
 #include "../global.h"
 
-#include <QObject>
-
 using namespace stefanfrings;
 
 class AddController: public HttpRequestHandler

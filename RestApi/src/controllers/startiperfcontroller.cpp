@@ -18,20 +18,8 @@ void StartIperfController::service(HttpRequest &request, HttpResponse &response)
         socket->connectToHost(QHostAddress::LocalHost, 8081);
 
         if(socket->waitForConnected()){
-            qDebug("Connected!");
 
-//            QString str = "";
-//            str.append("POST /start HTTP/1.1 \r\n ");
-//            str.append(QString("Host: %1:%2 \r\n").arg(8081).arg("localhost"));
-//            str.append(QString("Content-Length: %1 \r\n ").
-//                       arg(body.length()));
-//            str.append("Content-Type: application/json \r\n ");
-//            str.append("Connection: keep-alive \r\n ");
-//            str.append("\r\n");
-//            str.append(body.data());
-//            str.append("\r\n");
-
-            QByteArray toSend = configureRequest("localhost", 8081, body);
+            QByteArray toSend = configureRequest("/start" ,"localhost", 8081, body);
 
             socket->write(toSend.data(), toSend.length());
             socket->waitForBytesWritten();
@@ -39,11 +27,8 @@ void StartIperfController::service(HttpRequest &request, HttpResponse &response)
 
             QString fromIperf = QString(socket->readAll());
 
-            QString resStatus = fromIperf.split("\r\n").at(0).split(" ").at(1);
-            QString resBody = fromIperf.split("\r\n").at(4);
-
-//            qDebug() << resStatus;
-//            qDebug() << resBody;
+            QString resStatus = fromIperf.split("\r\n").first().split(' ').at(1);
+            QString resBody = fromIperf.split("\r\n").last();
 
             if(resStatus == "200"){
                 response.setStatus(200,"Ok");
@@ -63,8 +48,6 @@ void StartIperfController::service(HttpRequest &request, HttpResponse &response)
             socket->deleteLater();
         }
         else{
-            qDebug("Not Connected");
-
             response.setStatus(504, "Gateway Timeout");
             response.setHeader("Content-Type", "application/json");
 

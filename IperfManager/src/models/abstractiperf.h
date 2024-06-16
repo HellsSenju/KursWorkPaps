@@ -24,16 +24,16 @@ public:
     virtual void waitForFinished(int sec = 30) = 0; //-1 - бесконечное ожидание
 
     virtual QString getUuid(){
-        return uuid.toString();
+        return uuid.toString(QUuid::WithoutBraces);
     };
 
-    virtual const char* getUuidChar(){
-        return qPrintable(uuid.toString());
+    virtual const char& getUuidChar(){
+        return *qPrintable(uuid.toString(QUuid::WithoutBraces));
     };
 
-    virtual bool isStarted(){
-        return started;
-    }
+    virtual ProcessState getState(){
+        return state;
+    };
 
     virtual bool isServer(){
         return server;
@@ -43,10 +43,15 @@ public:
 
 
 protected:
-    QProcess *process = nullptr;
     QUuid uuid;
+    ProcessState state;
+    QProcess *process = nullptr;
     bool server;
-    bool started = false;
+
+    virtual void setState(ProcessState state){
+        this->state = state;
+        emit stateChanged(state);
+    };
 
 signals:
     void stateChanged(ProcessState state);

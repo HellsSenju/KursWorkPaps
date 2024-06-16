@@ -1,10 +1,11 @@
 #ifndef GLOBAL_H
 #define GLOBAL_H
 
-
 #include "httpsessionstore.h"
 #include "staticfilecontroller.h"
 #include "filelogger.h"
+
+#include <QNetworkAccessManager>
 
 using namespace stefanfrings;
 
@@ -22,5 +23,8 @@ extern  StaticFileController* staticFileController;
 
 /** Redirects log messages to a file */
 extern  FileLogger* logger;
+
+
+extern QNetworkAccessManager* manager;
 
 #endif // GLOBAL_H

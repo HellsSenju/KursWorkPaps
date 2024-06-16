@@ -1,10 +1,11 @@
-#include "addcontroller.h"
+#include "deletecontroller.h"
 
-AddController::AddController()
+DeleteController::DeleteController()
 {
+
 }
 
-void AddController::service(HttpRequest &request, HttpResponse &response)
+void DeleteController::service(HttpRequest &request, HttpResponse &response)
 {
     qDebug() << request.getBody();
     QJsonObject body =  parseRequest(request.getBody());

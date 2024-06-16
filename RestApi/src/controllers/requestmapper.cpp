@@ -1,7 +1,7 @@
-#include "requestmapper.h"
 #include "../global.h"
-#include "testcontroller.h"
+#include "requestmapper.h"
 #include "startiperfcontroller.h"
+#include "stopiperfcontroller.h"
 
 RequestMapper::RequestMapper(QObject* parent)
     :HttpRequestHandler(parent)
@@ -22,14 +22,14 @@ void RequestMapper::service(HttpRequest& request, HttpResponse& response)
 //    HttpSession session = sessionStore->getSession(request, response);
 //    qDebug("RequestMapper: sessionId = %s", session.getId().data());
 
-    if (path.startsWith("/test"))
-    {
-        TestController().service(request, response);
-    }
 
-    else if (path.startsWith("/iperf/start"))
+    if (path.startsWith("/iperf/start"))
     {
         StartIperfController().service(request, response);
+    }
+    else if (path.startsWith("/iperf/stop"))
+    {
+        StopIperfController().service(request, response);
     }
     // All other pathes are mapped to the static file controller.
     // In this case, a single instance is used for multiple requests.

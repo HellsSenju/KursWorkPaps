@@ -39,6 +39,7 @@ QString searchConfigFile()
         qWarning("%s/%s not found",qPrintable(dir),qPrintable(fileName));
     }
     qFatal("Cannot find config file %s",qPrintable(fileName));
+
     return nullptr;
 }
 
@@ -72,6 +73,9 @@ int main(int argc, char *argv[])
     new HttpListener(listenerSettings, new RequestMapper(&app), &app);
 
 
+    manager = new QNetworkAccessManager(&app);
+
+
 //    qDebug() << QUuid::createUuid().toString();
 //    qDebug() << QUuid::createUuid().toString();
 //    qDebug() << QUuid::createUuid().toString();
@@ -79,6 +83,6 @@ int main(int argc, char *argv[])
 //    qDebug() << QUuid::createUuid().toString();
 
     qWarning("Application has started");
-    app.exec();
+    return app.exec();
     qWarning("Application has stopped");
 }

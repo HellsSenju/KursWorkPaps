@@ -3,3 +3,4 @@
 HttpSessionStore* sessionStore;
 StaticFileController* staticFileController;
 FileLogger* logger;
+QNetworkAccessManager *manager;

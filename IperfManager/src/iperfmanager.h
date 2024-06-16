@@ -20,8 +20,8 @@ public:
     explicit IperfManager(QObject* parent=0);
     ~IperfManager();
 
-    bool getProcessStartStatus(const QString &uuid){
-        return pool.value(uuid)->isStarted();
+    ProcessState getProcessStatus(const QString &uuid){
+        return pool.value(uuid)->getState();
     };
 
 private:
@@ -29,13 +29,14 @@ private:
 
 
 public slots:
-    void startNewProcess(bool server, const QString &uuid, const QString &command);
-    void stopProcess(const QString &uuid);
+    bool startNewProcess(bool server, const QString &uuid, const QString &command);
+    bool stopProcess(const QString &uuid);
+    void deleteProcess(const QString &uuid);
 
     void onStateChanged(ProcessState state);
 
 signals:
-    void iperfStarted();
+    void iperfChanged();
 
 };
 

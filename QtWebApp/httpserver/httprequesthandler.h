@@ -80,22 +80,35 @@ public:
         return obj;
     };
 
-    virtual QByteArray configureRequest(const QString& ip,
+    virtual QByteArray configureRequest(const QString& url,
+                                        const QString& ip,
                                         int port,
                                         const QString& body)
     {
         QString str = "";
-        str.append("POST /start HTTP/1.1 \r\n ");
+        str.append(QString("POST %1 HTTP/1.1 \r\n ").arg(url));
         str.append(QString("Host: %1:%2 \r\n").arg(ip).arg(port));
         str.append(QString("Content-Length: %1 \r\n ").arg(body.length()));
         str.append("Content-Type: application/json \r\n ");
         str.append("Connection: keep-alive \r\n ");
         str.append("\r\n");
-        str.append(QString("%1").arg(body));
+        if(!body.isEmpty())
+            str.append(QString("%1 \r\n").arg(body));
         str.append("\r\n");
 
         return str.toLocal8Bit();
     };
+
+//    virtual QString getResponseStatus(QString response){
+//        QStringList list = response.split("\r\n");
+//        for(QString el: list){
+
+//        }
+//    };
+
+//    virtual void check(){
+
+//    };
 };
 
 } // end of namespace
