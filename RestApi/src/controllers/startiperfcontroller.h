@@ -19,6 +19,7 @@ public:
 private:
 
     bool checkRequest(QJsonObject request);
+    QString configureParams(QJsonObject request);
 };
 
 #endif // STARTIPERFCONTROLLER_H

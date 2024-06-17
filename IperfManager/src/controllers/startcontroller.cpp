@@ -13,17 +13,13 @@ void StartController::service(HttpRequest &request, HttpResponse &response)
     response.setHeader("Content-Type", "application/json");
 
     bool isServer;
-    QJsonObject body;
-    if(req.contains("server")){
-        body = req["server"].toObject();
-        isServer = true;
-    }
-    else{
-        body = req["client"].toObject();
-        isServer = false;
-    }
 
-    QString uuid = body["uuid"].toString();
+    if(req.value("mode").toString() == "-s")
+        isServer = true;
+    else
+        isServer = false;
+
+    QString uuid = req.value("uuid").toString();
 
     QTimer timer;
     timer.setSingleShot(true);
@@ -34,7 +30,7 @@ void StartController::service(HttpRequest &request, HttpResponse &response)
 
     timer.start(10000); //10 sec
 
-    if(!manager->startNewProcess(isServer, uuid, body["command"].toString())){
+    if(!manager->startNewProcess(isServer, uuid, req.value("command").toString())){
         QJsonObject object{
             {"IperfManager", "Процесс с таким идентификатором уже существует."}
         };

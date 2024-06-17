@@ -15,19 +15,21 @@ void StartIperfController::service(HttpRequest &request, HttpResponse &response)
         response.setHeader("Content-Type", "application/json");
 
         QJsonObject object{
-            {"RestApi", "Обязательные поля: ip, port, uuid, mode, server_ip (if mode=-c)"}
+            {"RestApi", "Обязательные поля: ip, port, uuid, mode, server_ip (if mode=-c)."}
         };
 
         response.write(QJsonDocument(object).toJson(QJsonDocument::Compact), true);
         return;
     }
 
-    QString uuid = req.value("uuid").toString();
     QString ip = req.value("ip").toString();
     int port = req.value("port").toInt();
 
-    req.remove("ip");
-    req.remove("port");
+    QJsonObject body{
+        {"uuid", req.value("uuid")},
+        {"command", configureParams(req)},
+        {"mode", req.value("mode")}
+    };
 
     QTcpSocket *socket = new  QTcpSocket(this);
 
@@ -38,7 +40,7 @@ void StartIperfController::service(HttpRequest &request, HttpResponse &response)
         QByteArray toSend = configureRequest("/start",
                                              ip,
                                              port,
-                                             QJsonDocument(req).toJson(QJsonDocument::Compact));
+                                             QJsonDocument(body).toJson(QJsonDocument::Compact));
 
         socket->write(toSend.data(), toSend.length());
         socket->waitForBytesWritten();
@@ -86,8 +88,43 @@ bool StartIperfController::checkRequest(QJsonObject request)
             !request.contains("mode"))
         return false;
 
+    if(request.value("mode").toString() != "-c" || request.value("mode").toString() != "-s" )
+        return false;
+
     if(request.value("mode").toString() == "-c" && !request.contains("server_ip"))
         return false;
 
     return true;
+}
+
+QString StartIperfController::configureParams(QJsonObject request)
+{
+    QString params;
+    params.append(request.value("mode").toString());
+    params.append(" ");
+
+    if(request.contains("server_ip")){
+        params.append(request.value("server_ip").toString());
+        params.append(" ");
+    }
+
+    if(request.contains("server_port")){
+        params.append(QString("-p %1 ").arg(request.value("server_port").toInt()));
+    }
+
+    if(request.contains("protocol")){
+        params.append(request.value("protocol").toString());
+        params.append(" ");
+    }
+
+    if(request.contains("interval")){
+        params.append(QString("-i %1 ").arg(request.value("interval").toInt()));
+    }
+
+    if(request.contains("time")){
+        params.append(QString("-t %1 ").arg(request.value("time").toInt()));
+    }
+
+    qDebug() << "params: " << params;
+    return params;
 }

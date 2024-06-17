@@ -18,7 +18,7 @@ IperfManager::~IperfManager()
 
 bool IperfManager::startNewProcess(bool server, const QString &uuid, const QString &command)
 {
-    qDebug("IperfManager : Попытка запустить процесс : %s", qPrintable(command));
+    qDebug("IperfManager : Попытка запустить процесс : %s", qPrintable(uuid));
 
     if(pool.contains(uuid))
         return false;

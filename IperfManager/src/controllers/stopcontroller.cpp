@@ -7,7 +7,10 @@ StopController::StopController()
 
 void StopController::service(HttpRequest &request, HttpResponse &response)
 {
-    QString uuid = request.getParameter("uuid");
+    qDebug() << request.getBody();
+    QJsonObject req =  parseRequest(request.getBody());
+
+    QString uuid = req.value("uuid").toString();
 
     response.setStatus(200, "Ok");
     response.setHeader("Content-Type", "application/json");
