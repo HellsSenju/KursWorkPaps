@@ -40,6 +40,7 @@ void ProcessesPool::deleteProcess(const QString &uuid)
 {
     pool.value(uuid)->deleteLater();
     pool.remove(uuid);
+    qDebug("ProcessesPool : onProcessStateChaned : %s удален из пула", qPrintable(uuid));
 }
 
 void ProcessesPool::onStateChanged(ProcessState state)
@@ -53,20 +54,24 @@ void ProcessesPool::onStateChanged(ProcessState state)
         disconnect(process, &AbstractProcess::stateChanged,
                    this, &ProcessesPool::onStateChanged);
 
-        qDebug("ProcessesPool : onProcessStateChaned : %s удален из пула", process->getUuidChar());
+        emit executed();
         break;
 
     case ProcessState::Crashed:
-        qDebug("ProcessesPool : onProcessStateChaned : %s crashed", process->getUuidChar());
+        qDebug("ProcessesPool : onProcessStateChaned : %s crashed", qPrintable(process->getUuid()));
+
+        emit executed();
         break;
 
     case ProcessState::FailedToStart:
-        qDebug("ProcessesPool : onProcessStateChaned : %s failed to start", process->getUuidChar());
+        qDebug("ProcessesPool : onProcessStateChaned : %s failed to start", qPrintable(process->getUuid()));
+
+        emit executed();
         break;
 
     default:
         break;
     }
 
-    emit executed();
+
 }

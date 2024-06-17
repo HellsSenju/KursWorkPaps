@@ -9,17 +9,19 @@ class Process : public AbstractProcess
 
 public:
     explicit Process(QUuid processUuid);
-    ~ Process();
 
-public:
-    void setParams(const QString &program, const QStringList &args);
-    void execute();
-    void stop();
+    QString getOutput() override{
+//        QJsonDocument doc;
+//        doc.setArray(interfaces);
+
+        return QJsonDocument(interfaces).toJson(QJsonDocument::Compact);
+    };
+
+private:
+    QJsonArray interfaces;
 
 private slots:
-    void onStandartOutput();
-    void onErrorOccurred(QProcess::ProcessError error);
-    void onStandartError();
+    void onStandartOutput() override;
 };
 
 #endif // PROCESS_H

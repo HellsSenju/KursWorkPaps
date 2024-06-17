@@ -1,11 +1,11 @@
-#include "startiperfcontroller.h"
+#include "addrulecontroller.h"
 
-StartIperfController::StartIperfController()
+AddRuleController::AddRuleController()
 {
 
 }
 
-void StartIperfController::service(HttpRequest &request, HttpResponse &response)
+void AddRuleController::service(HttpRequest &request, HttpResponse &response)
 {
     qDebug() << request.getBody();
     QJsonObject req =  parseRequest(request.getBody());
@@ -15,7 +15,7 @@ void StartIperfController::service(HttpRequest &request, HttpResponse &response)
         response.setHeader("Content-Type", "application/json");
 
         QJsonObject object{
-            {"RestApi", "Обязательные поля: ip, port, uuid, mode, server_ip (if mode=-c)."}
+            {"RestApi", "Обязательные поля: ip, port, uuid, command."}
         };
 
         response.write(QJsonDocument(object).toJson(QJsonDocument::Compact), true);
@@ -27,8 +27,7 @@ void StartIperfController::service(HttpRequest &request, HttpResponse &response)
 
     QJsonObject body{
         {"uuid", req.value("uuid")},
-        {"command", configureParams(req)},
-        {"mode", req.value("mode")}
+        {"command", req.value("command")}
     };
 
     QTcpSocket *socket = new  QTcpSocket(this);
@@ -37,7 +36,7 @@ void StartIperfController::service(HttpRequest &request, HttpResponse &response)
 
     if(socket->waitForConnected()){
 
-        QByteArray toSend = configureRequest("/start",
+        QByteArray toSend = configureRequest("/add",
                                              ip,
                                              port,
                                              QJsonDocument(body).toJson(QJsonDocument::Compact));
@@ -73,58 +72,19 @@ void StartIperfController::service(HttpRequest &request, HttpResponse &response)
         response.setHeader("Content-Type", "application/json");
 
         QJsonObject object{
-            {"RestApi", "Не удалось соединиться с IperfManager"}
+            {"RestApi", "Не удалось соединиться с TCManager"}
         };
 
         response.write(QJsonDocument(object).toJson(QJsonDocument::Compact), true);
     }
 }
 
-bool StartIperfController::checkRequest(QJsonObject request)
+bool AddRuleController::checkRequest(QJsonObject request)
 {
     if(!request.contains("ip") ||
             !request.contains("port") ||
             !request.contains("uuid") ||
-            !request.contains("mode"))
+            !request.contains("command"))
         return false;
-
-    if(request.value("mode").toString() != "-c" || request.value("mode").toString() != "-s" )
-        return false;
-
-    if(request.value("mode").toString() == "-c" && !request.contains("server_ip"))
-        return false;
-
     return true;
-}
-
-QString StartIperfController::configureParams(QJsonObject request)
-{
-    QString params;
-    params.append(request.value("mode").toString());
-    params.append(" ");
-
-    if(request.contains("server_ip")){
-        params.append(request.value("server_ip").toString());
-        params.append(" ");
-    }
-
-    if(request.contains("server_port")){
-        params.append(QString("-p %1 ").arg(request.value("server_port").toInt()));
-    }
-
-    if(request.contains("protocol")){
-        params.append(request.value("protocol").toString());
-        params.append(" ");
-    }
-
-    if(request.contains("interval")){
-        params.append(QString("-i %1 ").arg(request.value("interval").toInt()));
-    }
-
-    if(request.contains("time")){
-        params.append(QString("-t %1 ").arg(request.value("time").toInt()));
-    }
-
-    qDebug() << "params: " << params;
-    return params;
 }

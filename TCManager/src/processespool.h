@@ -7,6 +7,7 @@
 #include <QMap>
 #include <QUuid>
 #include <QStringList>
+#include <QString>
 
 #include "./models/abstractprocess.h"
 #include "./models/tcprocess.h"
@@ -27,6 +28,10 @@ public:
 
     ProcessState getProcessState(const QString& uuid){
         return pool.value(uuid)->getState();
+    };
+
+    QString getProcessOutput(const QString& uuid){
+        return pool.value(uuid)->getOutput();
     };
 
 private:

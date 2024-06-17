@@ -10,7 +10,7 @@ void StopIperfController::service(HttpRequest &request, HttpResponse &response)
     qDebug() << request.getBody();
     QJsonObject req =  parseRequest(request.getBody());
 
-    if(checkRequest(req)){
+    if(!checkRequest(req)){
         response.setStatus(400, "Not Acceptable. неправильный, некорректный запрос");
         response.setHeader("Content-Type", "application/json");
 

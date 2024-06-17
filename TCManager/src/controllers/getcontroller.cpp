@@ -9,6 +9,7 @@ void GetController::service(HttpRequest &request, HttpResponse &response)
 {
     qDebug() << request.getBody();
     QJsonObject body =  parseRequest(request.getBody());
+    QString uuid = body["uuid"].toString();
 
     QTimer timer;
     timer.setSingleShot(true);
@@ -19,18 +20,19 @@ void GetController::service(HttpRequest &request, HttpResponse &response)
 
     timer.start(10000); //10 sec
 
-    pool->execute(body["uuid"].toString(), Programs::TC, body["command"].toString());
+    pool->execute(uuid, Programs::TC, body["command"].toString());
 
     loop.exec();
 
     response.setStatus(200,"Ok");
     response.setHeader("Content-Type", "application/json");
 
-    switch (pool->getProcessState(body["uuid"].toString())) {
+    switch (pool->getProcessState(uuid)) {
     case ProcessState::Finished:
     {
+
         QJsonObject object{
-            {"TCManager", "Finished"}
+            {"TCManager", pool->getProcessOutput(uuid)}
         };
 
         response.write(QJsonDocument(object).toJson(QJsonDocument::Compact), true);
@@ -66,5 +68,5 @@ void GetController::service(HttpRequest &request, HttpResponse &response)
         break;
     }
 
-    pool->deleteProcess(body["uuid"].toString());
+    pool->deleteProcess(uuid);
 }

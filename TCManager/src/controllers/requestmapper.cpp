@@ -2,6 +2,9 @@
 #include "requestmapper.h"
 #include "addcontroller.h"
 #include "getcontroller.h"
+#include "getinterfacescontroller.h"
+#include "updatecontroller.h"
+#include "deletecontroller.h"
 
 RequestMapper::RequestMapper(QObject* parent)
     :HttpRequestHandler(parent)
@@ -26,8 +29,17 @@ void RequestMapper::service(HttpRequest& request, HttpResponse& response)
     if (path.startsWith("/add"))
         AddController().service(request, response);
 
+    else if(path.startsWith("/update"))
+        UpdateController().service(request, response);
+
+    else if(path.startsWith("/delete"))
+        DeleteController().service(request, response);
+
     else if(path.startsWith("/get"))
         GetController().service(request, response);
+
+    else if(path.startsWith("/interface"))
+        GetInterfacesController().service(request, response);
 
     // All other pathes are mapped to the static file controller.
     // In this case, a single instance is used for multiple requests.
