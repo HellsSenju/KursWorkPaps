@@ -61,4 +61,5 @@ void StopController::service(HttpRequest &request, HttpResponse &response)
         break;
     }
 
+    manager->deleteProcess(uuid);
 }

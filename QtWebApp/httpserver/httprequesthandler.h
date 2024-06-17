@@ -99,6 +99,19 @@ public:
         return str.toLocal8Bit();
     };
 
+    virtual bool validationIperf(QJsonObject request, bool start){
+        if(!request.contains("ip") || !request.contains("port"))
+            return false;
+
+        if(!request.contains("server") && !request.contains("client"))
+            return false;
+
+        QJsonObject ob = request.value(request.keys().first()).toObject();
+        if(!ob.contains("uuid") || !ob.contains("command"))
+            return false;
+        return true;
+    };
+
 //    virtual QString getResponseStatus(QString response){
 //        QStringList list = response.split("\r\n");
 //        for(QString el: list){

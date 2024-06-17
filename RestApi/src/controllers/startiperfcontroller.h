@@ -15,6 +15,10 @@ public:
     StartIperfController();
 
     void service(HttpRequest& request, HttpResponse& response);
+
+private:
+
+    bool checkRequest(QJsonObject request);
 };
 
 #endif // STARTIPERFCONTROLLER_H

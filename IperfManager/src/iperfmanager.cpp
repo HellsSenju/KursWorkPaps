@@ -18,7 +18,7 @@ IperfManager::~IperfManager()
 
 bool IperfManager::startNewProcess(bool server, const QString &uuid, const QString &command)
 {
-    qDebug("IperfManager : startNewProcess : %s", qPrintable(command));
+    qDebug("IperfManager : Попытка запустить процесс : %s", qPrintable(command));
 
     if(pool.contains(uuid))
         return false;
@@ -58,7 +58,7 @@ void IperfManager::deleteProcess(const QString &uuid)
 {
     pool.value(uuid)->deleteLater();
     pool.remove(uuid);
-    qDebug("IperfManager : onProcessStateChaned : %s удален из пула", qPrintable(uuid));
+    qDebug("IperfManager : Процесс удален из пула : %s", qPrintable(uuid));
 }
 
 void IperfManager::onStateChanged(ProcessState state)

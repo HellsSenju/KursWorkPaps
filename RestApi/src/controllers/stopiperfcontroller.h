@@ -14,6 +14,10 @@ public:
     StopIperfController();
 
     void service(HttpRequest& request, HttpResponse& response);
+
+private:
+
+    bool checkRequest(QJsonObject request);
 };
 
 #endif // STOPIPERFCONTROLLER_H

@@ -9,6 +9,9 @@ void StartController::service(HttpRequest &request, HttpResponse &response)
     qDebug() << request.getBody();
     QJsonObject req =  parseRequest(request.getBody());
 
+    response.setStatus(200, "Ok");
+    response.setHeader("Content-Type", "application/json");
+
     bool isServer;
     QJsonObject body;
     if(req.contains("server")){
@@ -20,6 +23,8 @@ void StartController::service(HttpRequest &request, HttpResponse &response)
         isServer = false;
     }
 
+    QString uuid = body["uuid"].toString();
+
     QTimer timer;
     timer.setSingleShot(true);
     QEventLoop loop;
@@ -29,12 +34,13 @@ void StartController::service(HttpRequest &request, HttpResponse &response)
 
     timer.start(10000); //10 sec
 
-    if(!manager->startNewProcess(isServer, body["uuid"].toString(), body["command"].toString())){
+    if(!manager->startNewProcess(isServer, uuid, body["command"].toString())){
         QJsonObject object{
-            {"IperfManager", "Процесса с таким идентификатором уже существует."}
+            {"IperfManager", "Процесс с таким идентификатором уже существует."}
         };
 
         response.write(QJsonDocument(object).toJson(QJsonDocument::Compact),true);
+        return;
     }
 
     loop.exec();
@@ -45,17 +51,10 @@ void StartController::service(HttpRequest &request, HttpResponse &response)
         };
 
         response.write(QJsonDocument(object).toJson(QJsonDocument::Compact),true);
+        return;
     }
 
-//    response.setStatus(200, "Ok");
-//    response.setHeader("Content-Type", "application/json");
-//    QJsonObject object{
-//        {"IperfManager", "Процесс успешно запустился."}
-//    };
-
-//    response.write(QJsonDocument(object).toJson(QJsonDocument::Compact), true);
-
-    switch (manager->getProcessStatus(body["uuid"].toString())) {
+    switch (manager->getProcessStatus(uuid)) {
     case ProcessState::Running:
     {
         QJsonObject object{

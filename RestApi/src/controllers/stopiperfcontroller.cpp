@@ -7,27 +7,37 @@ StopIperfController::StopIperfController()
 
 void StopIperfController::service(HttpRequest &request, HttpResponse &response)
 {
-    QString uuid = request.getParameter("uuid");
+    qDebug() << request.getBody();
+    QJsonObject req =  parseRequest(request.getBody());
 
-    if(uuid.isEmpty()){
-        response.setStatus(400, "неправильный, некорректный запрос");
+    if(checkRequest(req)){
+        response.setStatus(400, "Not Acceptable. неправильный, некорректный запрос");
         response.setHeader("Content-Type", "application/json");
 
         QJsonObject object{
-            {"rest_api_response", "error 400"}
+            {"RestApi", "Обязательные поля: ip, port, uuid."}
         };
 
         response.write(QJsonDocument(object).toJson(QJsonDocument::Compact), true);
         return;
     }
 
+    QString uuid = req.value("uuid").toString();
+    QString ip = req.value("ip").toString();
+    int port = req.value("port").toInt();
+
+    req.remove("ip");
+    req.remove("port");
 
     QTcpSocket *socket = new  QTcpSocket(this);
 
-    socket->connectToHost(QHostAddress::LocalHost, 8081);
+    socket->connectToHost(ip, port);
 
     if(socket->waitForConnected()){
-        QByteArray toSend = configureRequest(QString("/stop?uuid=%1").arg(uuid), "localhost", 8081, "");
+        QByteArray toSend = configureRequest("/stop",
+                                             ip,
+                                             port,
+                                             QJsonDocument(req).toJson(QJsonDocument::Compact));
 
         socket->write(toSend.data(), toSend.length());
         socket->waitForBytesWritten();
@@ -35,8 +45,8 @@ void StopIperfController::service(HttpRequest &request, HttpResponse &response)
 
         QString fromIperf = QString(socket->readAll());
 
-        QString resStatus = fromIperf.split("\r\n").at(0).split(" ").at(1);
-        QString resBody = fromIperf.split("\r\n").at(4);
+        QString resStatus = fromIperf.split("\r\n").first().split(" ").at(1);
+        QString resBody = fromIperf.split("\r\n").last();
 
         if(resStatus == "200"){
             response.setStatus(200,"Ok");
@@ -60,9 +70,17 @@ void StopIperfController::service(HttpRequest &request, HttpResponse &response)
         response.setHeader("Content-Type", "application/json");
 
         QJsonObject object{
-            {"rest_api_response", "Не удалось соединиться с IperfManager"}
+            {"RestApi", "Не удалось соединиться с IperfManager"}
         };
 
         response.write(QJsonDocument(object).toJson(QJsonDocument::Compact), true);
     }
+}
+
+bool StopIperfController::checkRequest(QJsonObject request)
+{
+    if(!request.contains("ip") || !request.contains("port") || !request.contains("uuid"))
+        return false;
+
+    return true;
 }
