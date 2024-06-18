@@ -1,7 +1,7 @@
 TARGET = IperfManager
 TEMPLATE = app
 QT -= gui
-QT += core
+QT += core network
 
 CONFIG += c++11 console
 CONFIG -= app_bundle
@@ -17,7 +17,8 @@ SOURCES += \
     src/controllers/requestmapper.cpp \
     src/controllers/startcontroller.cpp \
     src/controllers/statisticcontroller.cpp \
-    src/controllers/stopcontroller.cpp
+    src/controllers/stopcontroller.cpp \
+    src/network.cpp
 
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
@@ -33,7 +34,8 @@ HEADERS += \
     src/controllers/requestmapper.h \
     src/controllers/startcontroller.h \
     src/controllers/statisticcontroller.h \
-    src/controllers/stopcontroller.h
+    src/controllers/stopcontroller.h \
+    src/network.h
 
 include(../QtWebApp/httpserver/httpserver.pri)
 include(../QtWebApp/logging/logging.pri)

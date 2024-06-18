@@ -66,6 +66,8 @@ void IperfManager::onStateChanged(ProcessState state)
     QObject *p = sender();
     AbstractIperf* iperf = qobject_cast<AbstractIperf*>(p);
 
+    qDebug("IperfManager : onStateChanged : %s", qPrintable(iperf->getUuid()));
+
     switch (state) {
     case ProcessState::Starting:
         break;

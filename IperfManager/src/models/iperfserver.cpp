@@ -19,7 +19,7 @@ IperfServer::IperfServer(QUuid processUuid)
             break;
         case 1: //starting
             qDebug("IperfServer : Процесс запускается, но программа еще не была вызвана %s", qPrintable(getUuid()));
-            setState(ProcessState::Starting);
+//            setState(ProcessState::Starting);
             break;
         case 2: // running
 //            qDebug("stateChanged : %s : Процесс запущен и готов к чтению и записи", qPrintable(uuid.toString()));
@@ -39,82 +39,4 @@ IperfServer::IperfServer(QUuid processUuid)
 
         setState(ProcessState::Finished);
     });
-}
-
-IperfServer::~IperfServer()
-{
-    process->deleteLater();
-}
-
-void IperfServer::setParams(const QString &program, const QStringList &args)
-{
-    process->setProgram(program);
-    process->setArguments(args);
-}
-
-void IperfServer::start()
-{
-    process->start();
-//    process->waitForReadyRead(-1);
-}
-
-void IperfServer::stop()
-{
-    process->terminate();
-}
-
-void IperfServer::waitForFinished(int sec)
-{
-    process->waitForFinished(sec);
-}
-
-void IperfServer::onStandartOutput()
-{
-    qDebug() << "IperfServer : standartOutput: " <<  process->readAll();
-
-//    qDebug("IperfServer : standartOutput (%s): %s", qPrintable(processUuid.toString()), qPrintable(process->readAll()));
-}
-
-void IperfServer::onErrorOccurred(QProcess::ProcessError error)
-{
-    switch (error) {
-    case 0:
-        qDebug("IperfServer : errorOccurred : %s : FailedToStart", qPrintable(getUuid()));
-        break;
-
-    case 1:
-        qDebug("IperfServer : errorOccurred : %s : Crashed", qPrintable(getUuid()));
-        break;
-
-    case 2:
-        qDebug("IperfServer : errorOccurred : %s : Timedout", qPrintable(getUuid()));
-        break;
-
-    case 3:
-        qDebug("IperfServer : errorOccurred : %s : ReadError", qPrintable(getUuid()));
-        break;
-
-    case 4:
-        qDebug("IperfServer : errorOccurred : %s : WriteError", qPrintable(getUuid()));
-        break;
-
-    case 5:
-        qDebug("IperfServer : errorOccurred : %s : UnknownError", qPrintable(getUuid()));
-        break;
-
-    default:
-        qDebug("IperfServer : errorOccurred : %s : default", qPrintable(getUuid()));
-        break;
-    }
-}
-
-void IperfServer::onStandartError()
-{
-    qDebug("IperfServer : standartError (%s): %s", qPrintable(getUuid()), qPrintable(process->errorString()));
-}
-
-void IperfServer::onStarted()
-{
-    qDebug("IperfServer : Процесс запущен и готов к чтению и записи %s", qPrintable(getUuid()));
-    setState(ProcessState::Running);
 }

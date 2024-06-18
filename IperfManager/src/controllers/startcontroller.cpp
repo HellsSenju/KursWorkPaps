@@ -49,7 +49,7 @@ void StartController::service(HttpRequest &request, HttpResponse &response)
         response.write(QJsonDocument(object).toJson(QJsonDocument::Compact),true);
         return;
     }
-
+    qDebug() << "process state" << manager->getProcessStatus(uuid);
     switch (manager->getProcessStatus(uuid)) {
     case ProcessState::Running:
     {
@@ -84,7 +84,8 @@ void StartController::service(HttpRequest &request, HttpResponse &response)
     case ProcessState::FailedToStart:
     {
         QJsonObject object{
-            {"IperfManager", "Не удалось запустить процесс. Либо запущенная программа отсутствует, либо у вас недостаточно прав для ее запуска."}
+            {"IperfManager", "Не удалось запустить процесс. "
+                "Либо программа отсутствует, либо недостаточно прав для запуска, либо неверная команда."}
         };
 
         response.write(QJsonDocument(object).toJson(QJsonDocument::Compact), true);

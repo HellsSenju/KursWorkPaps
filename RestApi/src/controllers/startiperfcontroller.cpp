@@ -88,7 +88,7 @@ bool StartIperfController::checkRequest(QJsonObject request)
             !request.contains("mode"))
         return false;
 
-    if(request.value("mode").toString() != "-c" || request.value("mode").toString() != "-s" )
+    if(request.value("mode").toString() != "-c" && request.value("mode").toString() != "-s" )
         return false;
 
     if(request.value("mode").toString() == "-c" && !request.contains("server_ip"))
