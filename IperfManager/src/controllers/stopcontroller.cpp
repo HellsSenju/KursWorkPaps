@@ -22,9 +22,7 @@ void StopController::service(HttpRequest &request, HttpResponse &response)
     connect( manager, &IperfManager::iperfChanged, &loop, &QEventLoop::quit);
     connect( &timer, &QTimer::timeout, &loop, &QEventLoop::quit );
 
-    timer.start(10000); //10 sec
-
-    if(!manager->stopProcess(uuid)){
+    if(!manager->checkDublicates(uuid)){
         QJsonObject object{
             {"IperfManager", "Процесса с таким идентификатором не существует."}
         };
@@ -33,6 +31,9 @@ void StopController::service(HttpRequest &request, HttpResponse &response)
         return;
     }
 
+    manager->stopProcess(uuid);
+
+    timer.start(10000); //10 sec
     loop.exec();
 
     if(!timer.isActive()){

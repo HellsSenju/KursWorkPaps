@@ -28,9 +28,7 @@ void StartController::service(HttpRequest &request, HttpResponse &response)
     connect( manager, &IperfManager::iperfChanged, &loop, &QEventLoop::quit);
     connect( &timer, &QTimer::timeout, &loop, &QEventLoop::quit );
 
-    timer.start(10000); //10 sec
-
-    if(!manager->startNewProcess(isServer, uuid, req.value("command").toString())){
+    if(manager->checkDublicates(uuid)){
         QJsonObject object{
             {"IperfManager", "Процесс с таким идентификатором уже существует."}
         };
@@ -39,6 +37,9 @@ void StartController::service(HttpRequest &request, HttpResponse &response)
         return;
     }
 
+    manager->startNewProcess(isServer, uuid, req.value("command").toString());
+
+    timer.start(10000); //10 sec
     loop.exec();
 
     if(!timer.isActive()){
@@ -49,7 +50,7 @@ void StartController::service(HttpRequest &request, HttpResponse &response)
         response.write(QJsonDocument(object).toJson(QJsonDocument::Compact),true);
         return;
     }
-    qDebug() << "process state" << manager->getProcessStatus(uuid);
+
     switch (manager->getProcessStatus(uuid)) {
     case ProcessState::Running:
     {

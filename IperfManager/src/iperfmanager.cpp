@@ -16,12 +16,9 @@ IperfManager::~IperfManager()
     }
 }
 
-bool IperfManager::startNewProcess(bool server, const QString &uuid, const QString &command)
+void IperfManager::startNewProcess(bool server, const QString &uuid, const QString &command)
 {
     qDebug("IperfManager : Попытка запустить процесс : %s", qPrintable(uuid));
-
-    if(pool.contains(uuid))
-        return false;
 
     AbstractIperf* iperf = nullptr;
 
@@ -37,21 +34,22 @@ bool IperfManager::startNewProcess(bool server, const QString &uuid, const QStri
             this,
             &IperfManager::onStateChanged);
 
+    connect(iperf,
+            &AbstractIperf::deleteProcess,
+            this,
+            &IperfManager::deleteProcess);
+
     pool.insert(uuid, iperf);
 
     iperf->setParams("iperf", command.split(' '));
     iperf->start();
-    return true;
 }
 
-bool IperfManager::stopProcess(const QString &uuid)
+void IperfManager::stopProcess(const QString &uuid)
 {
     qDebug("IperfManager : остановка процесса : %s", qPrintable(uuid));
-    if(!pool.contains(uuid))
-        return false;
 
     pool.value(uuid)->stop();
-    return true;
 }
 
 void IperfManager::deleteProcess(const QString &uuid)
@@ -66,7 +64,7 @@ void IperfManager::onStateChanged(ProcessState state)
     QObject *p = sender();
     AbstractIperf* iperf = qobject_cast<AbstractIperf*>(p);
 
-    qDebug("IperfManager : onStateChanged : %s", qPrintable(iperf->getUuid()));
+//    qDebug("IperfManager : onStateChanged : %s", qPrintable(iperf->getUuid()));
 
     switch (state) {
     case ProcessState::Starting:

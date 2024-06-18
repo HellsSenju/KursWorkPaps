@@ -7,6 +7,7 @@
 #include "filelogger.h"
 #include "iperfmanager.h"
 
+
 using namespace stefanfrings;
 
 /**
@@ -25,5 +26,7 @@ extern  StaticFileController* staticFileController;
 extern  FileLogger* logger;
 
 extern IperfManager* manager;
+
+
 
 #endif // GLOBAL_H

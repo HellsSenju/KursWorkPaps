@@ -1,12 +1,16 @@
 #include "../global.h"
 #include "requestmapper.h"
-#include "startiperfcontroller.h"
-#include "stopiperfcontroller.h"
-#include "addrulecontroller.h"
-#include "getrulecontroller.h"
-#include "gettcinterfacescontroller.h"
-#include "updaterulecontroller.h"
-#include "deleterulecontroller.h"
+
+#include "./iperf/startiperfcontroller.h"
+#include "./iperf/stopiperfcontroller.h"
+#include "./iperf/fromiperfcontroller.h"
+
+#include "./tc/addrulecontroller.h"
+#include "./tc/getrulecontroller.h"
+#include "./tc/gettcinterfacescontroller.h"
+#include "./tc/updaterulecontroller.h"
+#include "./tc/deleterulecontroller.h"
+
 
 RequestMapper::RequestMapper(QObject* parent)
     :HttpRequestHandler(parent)
@@ -33,6 +37,9 @@ void RequestMapper::service(HttpRequest& request, HttpResponse& response)
 
     else if (path.startsWith("/iperf/stop"))
         StopIperfController().service(request, response);
+
+    else if (path.startsWith("/iperf"))
+        FromIperfController().service(request, response);
 
     else if (path.startsWith("/tc/get"))
         GetRuleController().service(request, response);

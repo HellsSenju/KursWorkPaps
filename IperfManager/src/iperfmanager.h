@@ -24,13 +24,18 @@ public:
         return pool.value(uuid)->getState();
     };
 
+    bool checkDublicates(const QString& uuid){
+        return pool.contains(uuid);
+    };
+
+
 private:
     QMap<QString, AbstractIperf*> pool;
 
 
 public slots:
-    bool startNewProcess(bool server, const QString &uuid, const QString &command);
-    bool stopProcess(const QString &uuid);
+    void startNewProcess(bool server, const QString &uuid, const QString &command);
+    void stopProcess(const QString &uuid);
     void deleteProcess(const QString &uuid);
 
     void onStateChanged(ProcessState state);

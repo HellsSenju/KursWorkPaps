@@ -34,6 +34,10 @@ public:
         return pool.value(uuid)->getOutput();
     };
 
+    bool checkDublicates(const QString& uuid){
+        return pool.contains(uuid);
+    };
+
 private:
     const QString tc = "tc";
     const QString nmcli = "nmcli";

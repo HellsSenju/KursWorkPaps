@@ -36,7 +36,14 @@ IperfServer::IperfServer(QUuid processUuid)
                exitCode,
                exitStatus
         );
-
         setState(ProcessState::Finished);
+
+        if(!stoped){
+            QJsonObject body{
+                {"efrewf", "fessef"}
+            };
+            network->post("/iperf", body);
+            emit deleteProcess(getUuid());
+        }
     });
 }

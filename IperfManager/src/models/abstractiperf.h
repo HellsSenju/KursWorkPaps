@@ -8,6 +8,8 @@
 #include <QUuid>
 #include <QString>
 
+#include "../globalnetwork.h"
+
 enum ProcessState {Starting, Running, Finished, Crashed, FailedToStart};
 Q_DECLARE_METATYPE(ProcessState)
 
@@ -31,6 +33,7 @@ public:
 
     virtual void stop(){
         process->terminate();
+        stoped = true;
     };
 
     virtual void waitForFinished(int sec = 30){
@@ -53,14 +56,12 @@ public:
         return server;
     }
 
-//    virtual bool finished(int exitCode);
-
-
 protected:
     QUuid uuid;
     ProcessState state;
     QProcess *process = nullptr;
     bool server;
+    bool stoped;
 
     virtual void setState(ProcessState state){
         this->state = state;
@@ -69,6 +70,10 @@ protected:
 
 protected slots:
     virtual void onStandartOutput(){
+//        QJsonObject body{
+//            {"efrewf", "fessef"}
+//        };
+//        network->post("/iperf/start", body);
         qDebug() << "Iperf : standartOutput: " <<  process->readAll();
     };
 
@@ -76,7 +81,7 @@ protected slots:
         switch (error) {
         case QProcess::ProcessError::FailedToStart :
             qDebug("Iperf : errorOccurred : %s : FailedToStart", qPrintable(getUuid()));
-            emit stateChanged(ProcessState::Running);
+            emit stateChanged(ProcessState::FailedToStart);
             break;
 
         case QProcess::ProcessError::Crashed:
@@ -117,6 +122,7 @@ protected slots:
 
 signals:
     void stateChanged(ProcessState state);
+    void deleteProcess(const QString &uuid);
 
 };
 

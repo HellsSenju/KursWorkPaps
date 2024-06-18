@@ -10,7 +10,7 @@
 #include "global.h"
 #include "controllers/requestmapper.h"
 #include "models/abstractiperf.h"
-#include "network.h"
+#include "globalnetwork.h"
 
 QString searchConfigFile()
 {
@@ -91,8 +91,10 @@ int main(int argc, char *argv[])
     // создание менеджера процессов iperf
     manager = new IperfManager();
 
-    Network net;
-    net.getData();
+    // настройка Network
+    QSettings* apiSettings = new QSettings(configFileName,QSettings::IniFormat, &app);
+    apiSettings->beginGroup("api");
+    network = new Network(apiSettings);
 
 //    qDebug() << QUuid::createUuid().toString();
 //    qDebug() << QUuid::createUuid().toString();

@@ -9,16 +9,17 @@ CONFIG -= app_bundle
 OTHER_FILES += etc/* logs/*
 
 SOURCES += \
-        src/controllers/addrulecontroller.cpp \
-        src/controllers/deleterulecontroller.cpp \
-        src/controllers/getrulecontroller.cpp \
-        src/controllers/gettcinterfacescontroller.cpp \
-        src/controllers/startiperfcontroller.cpp \
-        src/controllers/stopiperfcontroller.cpp \
-        src/controllers/updaterulecontroller.cpp \
+        src/controllers/iperf/fromiperfcontroller.cpp \
+        src/controllers/tc/addrulecontroller.cpp \
+        src/controllers/tc/deleterulecontroller.cpp \
+        src/controllers/tc/getrulecontroller.cpp \
+        src/controllers/tc/gettcinterfacescontroller.cpp \
+        src/controllers/tc/updaterulecontroller.cpp \
+        src/controllers/iperf/startiperfcontroller.cpp \
+        src/controllers/iperf/stopiperfcontroller.cpp \
+        src/controllers/requestmapper.cpp \
         src/main.cpp\
-        src/global.cpp \
-        src/controllers/requestmapper.cpp
+        src/global.cpp
 
 
 # Default rules for deployment.
@@ -27,15 +28,16 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 HEADERS += \
-        src/controllers/addrulecontroller.h \
-        src/controllers/deleterulecontroller.h \
-        src/controllers/getrulecontroller.h \
-        src/controllers/gettcinterfacescontroller.h \
-        src/controllers/startiperfcontroller.h \
-        src/controllers/stopiperfcontroller.h \
-        src/controllers/updaterulecontroller.h \
-        src/global.h \
-        src/controllers/requestmapper.h
+        src/controllers/iperf/fromiperfcontroller.h \
+        src/controllers/tc/addrulecontroller.h \
+        src/controllers/tc/deleterulecontroller.h \
+        src/controllers/tc/getrulecontroller.h \
+        src/controllers/tc/gettcinterfacescontroller.h \
+        src/controllers/tc/updaterulecontroller.h \
+        src/controllers/iperf/startiperfcontroller.h \
+        src/controllers/iperf/stopiperfcontroller.h \
+        src/controllers/requestmapper.h \
+        src/global.h
 
 include(../QtWebApp/httpserver/httpserver.pri)
 include(../QtWebApp/logging/logging.pri)
