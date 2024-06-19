@@ -3,7 +3,6 @@
 ProcessesPool::ProcessesPool(QObject *parent)
     : QObject{parent}
 {
-
 }
 
 ProcessesPool::~ProcessesPool()

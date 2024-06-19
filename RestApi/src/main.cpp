@@ -49,7 +49,7 @@ int main(int argc, char *argv[])
     app.setApplicationName("RestApi");
 
     // поиск конфигурационного файла
-    QString configFileName=searchConfigFile();
+    QString configFileName = searchConfigFile();
 
     // настройка логирования в файл
     QSettings* logSettings=new QSettings(configFileName,QSettings::IniFormat, &app);

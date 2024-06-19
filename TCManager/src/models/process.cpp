@@ -28,7 +28,7 @@ Process::Process(QUuid processUuid)
     connect(process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
         [=](int exitCode, QProcess::ExitStatus exitStatus)
     {
-        qDebug("Процес выполнился %s. exitCode: %i. exitStatus: %i.",
+        qDebug("Process : Процес выполнился %s. exitCode: %i. exitStatus: %i.",
                qPrintable(getUuid()),
                exitCode,
                exitStatus

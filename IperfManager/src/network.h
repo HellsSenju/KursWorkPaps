@@ -2,16 +2,12 @@
 #define NETWORK_H
 
 #include <QObject>
-#include <QNetworkAccessManager>
-#include <QNetworkRequest>
-#include <QNetworkReply>
-#include <QUrl>
-#include <QTextCodec>
 #include <QDebug>
 #include <QJsonObject>
 #include <QJsonDocument>
 #include <QHostAddress>
 #include <QSettings>
+#include <QTcpSocket>
 
 
 class Network : public QObject
@@ -19,7 +15,6 @@ class Network : public QObject
     Q_OBJECT
 public:
     explicit Network(const QSettings* settings, QObject *parent = nullptr);
-    ~Network();
 
     struct Response{
         QString resStatus;
@@ -39,14 +34,12 @@ public:
 
 
 public slots:
-    void getData();
-    void onResult(QNetworkReply *reply);
+
 
 signals:
     void onReady();
 
 private:
-    QNetworkAccessManager* manager;
     QString ip;
     int port;
 

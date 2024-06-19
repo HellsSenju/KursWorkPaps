@@ -34,6 +34,10 @@ public:
         return pool.value(uuid)->getOutput();
     };
 
+    QString getProcessError(const QString& uuid){
+        return pool.value(uuid)->getError();
+    };
+
     bool checkDublicates(const QString& uuid){
         return pool.contains(uuid);
     };

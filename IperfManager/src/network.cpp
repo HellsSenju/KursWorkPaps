@@ -7,16 +7,8 @@ Network::Network(const QSettings* settings, QObject *parent)
 
     ip = settings->value("ip").toString();
     port = settings->value("port").toInt();
-
-    manager = new QNetworkAccessManager();
-    manager->connectToHost(ip, port);
-    connect(manager, &QNetworkAccessManager::finished, this, &Network::onResult);
 }
 
-Network::~Network()
-{
-    manager->deleteLater();
-}
 
 Network::Response* Network::post(const QString& url, const QString& ip, int port, QJsonObject body)
 {
@@ -121,38 +113,3 @@ QJsonObject Network::parseRequest(const QString &in)
     return obj;
 }
 
-
-
-void Network::getData()
-{
-    QJsonObject toSend{
-        {"nfr nfr", "qwertty"}
-    };
-
-    QJsonObject obj;
-    obj["key1"] = "value1";
-    obj["key2"] = "value2";
-    QJsonDocument doc(obj);
-    QByteArray data = doc.toJson();
-    qDebug() << data;
-
-    QNetworkRequest request(QUrl("http://localhost:8080/iperf/start"));
-    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
-    request.setHeader(QNetworkRequest::ContentLengthHeader, toSend.length());
-
-    request.setRawHeader("Connection", "keep-alive");
-
-//    manager->post(request, QJsonDocument(toSend).toJson(QJsonDocument::Compact));
-    manager->post(request, data);
-}
-
-void Network::onResult(QNetworkReply *reply)
-{
-    if(reply->error()){
-        qDebug() << "error " << reply->errorString();
-    }
-    else{
-        qDebug() << "read all " << QString::fromUtf8(reply->readAll());;
-    }
-
-}

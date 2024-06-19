@@ -4,6 +4,8 @@
 #include "./iperf/startiperfcontroller.h"
 #include "./iperf/stopiperfcontroller.h"
 #include "./iperf/fromiperfcontroller.h"
+#include "./iperf/erroriperfcontroller.h"
+#include "./iperf/finishediperfcontroller.h"
 
 #include "./tc/addrulecontroller.h"
 #include "./tc/getrulecontroller.h"
@@ -38,8 +40,13 @@ void RequestMapper::service(HttpRequest& request, HttpResponse& response)
     else if (path.startsWith("/iperf/stop"))
         StopIperfController().service(request, response);
 
-    else if (path.startsWith("/iperf"))
-        FromIperfController().service(request, response);
+    // получение информации о сбоях (crashed)
+    else if (path.startsWith("/iperf/error"))
+        ErrorIperfController().service(request, response);
+
+    // получение информации о завершении процесса
+    else if (path.startsWith("/iperf/error"))
+        FinishedIperfController().service(request, response);
 
     else if (path.startsWith("/tc/get"))
         GetRuleController().service(request, response);

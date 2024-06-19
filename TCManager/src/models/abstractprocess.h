@@ -51,11 +51,17 @@ public:
         return output;
     };
 
+    virtual QString getError(){
+        error.remove("\n");
+        return error;
+    };
+
 protected:
     QProcess *process = nullptr;
     QUuid uuid;
     ProcessState state;
-    QString output;
+    QString output = "";
+    QString error = "";
 
     virtual void setState(ProcessState newState){
         state = newState;
@@ -69,39 +75,42 @@ protected slots:
     };
 
     virtual void onStandartError(){
-        qDebug("standartError (%s): %s", getUuidChar(), qPrintable(process->readAllStandardError()));
+        QString temp = process->readAllStandardError();
+        if(temp.contains("Error"))
+            error = temp;
+        qDebug("standartError (%s): %s", qPrintable(getUuid()), qPrintable(temp));
     };
 
     virtual void onErrorOccurred(QProcess::ProcessError error){
         switch (error) {
         case 0:
-            qDebug("errorOccurred : %s : FailedToStart", qPrintable(uuid.toString()));
+            qDebug("errorOccurred : %s : FailedToStart", qPrintable(getUuid()));
             setState(ProcessState::FailedToStart);
             break;
 
         case 1:
-            qDebug("errorOccurred : %s : Crashed", qPrintable(uuid.toString()));
+            qDebug("errorOccurred : %s : Crashed", qPrintable(getUuid()));
             setState(ProcessState::Crashed);
             break;
 
         case 2:
-            qDebug("errorOccurred : %s : Timedout", qPrintable(uuid.toString()));
+            qDebug("errorOccurred : %s : Timedout", qPrintable(getUuid()));
             break;
 
         case 3:
-            qDebug("errorOccurred : %s : ReadError", qPrintable(uuid.toString()));
+            qDebug("errorOccurred : %s : ReadError", qPrintable(getUuid()));
             break;
 
         case 4:
-            qDebug("errorOccurred : %s : WriteError", qPrintable(uuid.toString()));
+            qDebug("errorOccurred : %s : WriteError", qPrintable(getUuid()));
             break;
 
         case 5:
-            qDebug("errorOccurred : %s : UnknownError", qPrintable(uuid.toString()));
+            qDebug("errorOccurred : %s : UnknownError", qPrintable(getUuid()));
             break;
 
         default:
-            qDebug("errorOccurred : %s : default", qPrintable(uuid.toString()));
+            qDebug("errorOccurred : %s : default", qPrintable(getUuid()));
             break;
         }
     };

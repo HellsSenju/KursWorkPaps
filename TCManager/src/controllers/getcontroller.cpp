@@ -18,6 +18,15 @@ void GetController::service(HttpRequest &request, HttpResponse &response)
     connect( pool, &ProcessesPool::executed, &loop, &QEventLoop::quit);
     connect( &timer, &QTimer::timeout, &loop, &QEventLoop::quit );
 
+    if(pool->checkDublicates(uuid)){
+        QJsonObject object{
+            {"TCManager", "Процесс с таким идентификатором уже существует."}
+        };
+
+        response.write(QJsonDocument(object).toJson(QJsonDocument::Compact),true);
+        return;
+    }
+
     timer.start(10000); //10 sec
 
     pool->execute(uuid, Programs::TC, body["command"].toString());

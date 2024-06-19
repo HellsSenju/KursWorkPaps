@@ -50,6 +50,7 @@ void StartIperfController::service(HttpRequest &request, HttpResponse &response)
 
         QString resStatus = fromIperf.split("\r\n").first().split(' ').at(1);
         QString resBody = fromIperf.split("\r\n").last();
+        qDebug() << resBody;
 
         if(resStatus == "200"){
             response.setStatus(200,"Ok");

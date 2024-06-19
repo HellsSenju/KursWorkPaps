@@ -6,3 +6,5 @@ connect( manager, &IperfManager::iperfStarted, this, [=](bool res) mutable {
             started = res;
             qDebug() << started;
 });
+
+apt install libqt5sql5-psql
