@@ -9,7 +9,7 @@ Network::Network(const QSettings* settings, QObject *parent)
     port = settings->value("port").toInt();
 
     manager = new QNetworkAccessManager();
-    manager->connectToHost("localhost", 8080);
+    manager->connectToHost(ip, port);
     connect(manager, &QNetworkAccessManager::finished, this, &Network::onResult);
 }
 
