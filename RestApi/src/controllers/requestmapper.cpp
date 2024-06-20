@@ -45,7 +45,7 @@ void RequestMapper::service(HttpRequest& request, HttpResponse& response)
         ErrorIperfController().service(request, response);
 
     // получение информации о завершении процесса
-    else if (path.startsWith("/iperf/error"))
+    else if (path.startsWith("/iperf/finished"))
         FinishedIperfController().service(request, response);
 
     else if (path.startsWith("/tc/get"))

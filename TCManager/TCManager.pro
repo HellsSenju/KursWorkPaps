@@ -10,6 +10,8 @@ OTHER_FILES += etc/* logs/*
 
 
 SOURCES += \
+    ../IperfManager/src/globalnetwork.cpp \
+    ../IperfManager/src/network.cpp \
     src/controllers/addcontroller.cpp \
     src/controllers/deletecontroller.cpp \
     src/controllers/getcontroller.cpp \
@@ -28,6 +30,8 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 HEADERS += \
+    ../IperfManager/src/globalnetwork.h \
+    ../IperfManager/src/network.h \
     src/controllers/addcontroller.h \
     src/controllers/deletecontroller.h \
     src/controllers/getcontroller.h \

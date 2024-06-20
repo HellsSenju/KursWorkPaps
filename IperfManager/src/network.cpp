@@ -43,6 +43,7 @@ Network::Response* Network::post(const QString& url, const QString& ip, int port
 
 Network::Response *Network::post(const QString &url, QJsonObject body)
 {
+    qDebug() << "Network : " << QJsonDocument(body).toJson(QJsonDocument::Compact);
     QTcpSocket *socket = new  QTcpSocket();
 
     socket->connectToHost(ip, port);
@@ -54,7 +55,10 @@ Network::Response *Network::post(const QString &url, QJsonObject body)
                                              port,
                                              QJsonDocument(body).toJson(QJsonDocument::Compact));
 
-        socket->write(toSend.data(), toSend.length());
+        qDebug() << "Res " << toSend.length();
+        qDebug() << "Res " << toSend.size();
+        qint64 res = socket->write(toSend.data(), toSend.length());
+        qDebug() << "Res " << res;
         socket->waitForBytesWritten();
         socket->waitForReadyRead();
 

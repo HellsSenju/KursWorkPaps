@@ -40,8 +40,11 @@ IperfServer::IperfServer(QUuid processUuid)
 
         if(!stoped){
             QJsonObject body{
-                {"efrewf", "fessef"}
+                {"IperfManager", "Процесс был завершен"}
             };
+            if(!error.isEmpty())
+                body["error"] = error;
+
             network->post("/iperf", body);
             emit deleteProcess(getUuid());
         }

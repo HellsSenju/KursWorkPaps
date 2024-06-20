@@ -33,6 +33,23 @@ TCProcess::TCProcess(QUuid processUuid)
                exitCode,
                exitStatus
         );
-        setState(ProcessState::Finished);
+        if(exitStatus == 0)
+            setState(ProcessState::Finished);
+        else
+            setState(ProcessState::Crashed);
+
+        if(!stoped){
+
+            QJsonObject body;
+            body["uuid"] = getUuid();
+            body["status"] = QString("TCManager : Процесс был завершен");
+
+            error = process->readAllStandardError();
+            if(!error.isEmpty())
+                body["error"] = error;
+
+            network->post("/iperf/finished", body);
+            emit deleteProcess(getUuid());
+        }
     });
 }

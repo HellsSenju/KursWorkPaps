@@ -8,6 +8,7 @@
 #include "httplistener.h"
 #include "global.h"
 #include "controllers/requestmapper.h"
+#include "../IperfManager/src/globalnetwork.h"
 
 QString searchConfigFile()
 {
@@ -76,8 +77,13 @@ int main(int argc, char *argv[])
     listenerSettings->beginGroup("listener");
     new HttpListener(listenerSettings, new RequestMapper(&app), &app);
 
-    // создание пула процессов tc
+    // создание пула процессов
     pool = new ProcessesPool();
+
+    // настройка Network
+    QSettings* apiSettings = new QSettings(configFileName,QSettings::IniFormat, &app);
+    apiSettings->beginGroup("api");
+    network = new Network(apiSettings);
 
 //    qDebug() << QUuid::createUuid().toString();
 //    qDebug() << QUuid::createUuid().toString();

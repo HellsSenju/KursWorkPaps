@@ -18,6 +18,10 @@ void DataBaseConnection::connect()
     db.setUserName(settings->value("userName").toString());
     //пароль
     db.setPassword(settings->value("password").toString());
+
+    //открытие соединения
+    if(db.open()) qDebug("DataBaseConnection : db open");
+    else qDebug() << db.lastError().text();
 }
 
 QJsonObject DataBaseConnection::get(QString dbName, QString SQL, QJsonArray injections)

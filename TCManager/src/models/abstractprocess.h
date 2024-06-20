@@ -7,8 +7,11 @@
 #include <QUuid>
 #include <QString>
 #include <QStringList>
+#include <QJsonObject>
 #include <QJsonArray>
 #include <QJsonDocument>
+
+#include "../IperfManager/src/globalnetwork.h"
 
 
 enum ProcessState {Starting, Running, Finished, Crashed, FailedToStart};
@@ -32,6 +35,7 @@ public:
     };
 
     virtual void stop(){
+        stoped = true;
         process->terminate();
     };
 
@@ -62,6 +66,7 @@ protected:
     ProcessState state;
     QString output = "";
     QString error = "";
+    bool stoped = false;
 
     virtual void setState(ProcessState newState){
         state = newState;
@@ -118,6 +123,7 @@ protected slots:
 
 signals:
     void stateChanged(ProcessState state);
+    void deleteProcess(const QString &uuid);
 };
 
 #endif // ABSTRACTPROCESS_H

@@ -60,8 +60,9 @@ protected:
     QUuid uuid;
     ProcessState state;
     QProcess *process = nullptr;
+    QString error = "";
     bool server;
-    bool stoped;
+    bool stoped = false;
 
     virtual void setState(ProcessState state){
         this->state = state;
@@ -75,6 +76,13 @@ protected slots:
 //        };
 //        network->post("/iperf/start", body);
         qDebug() << "Iperf : standartOutput: " <<  process->readAll();
+    };
+
+    virtual void onStandartError(){
+        QString temp = process->readAllStandardError();
+        if(temp.contains("Error"))
+            error = temp;
+        qDebug("standartError (%s): %s", qPrintable(getUuid()), qPrintable(temp));
     };
 
     virtual void onErrorOccurred(QProcess::ProcessError error){
@@ -109,10 +117,6 @@ protected slots:
             qDebug("Iperf : errorOccurred : %s : default", qPrintable(getUuid()));
             break;
         }
-    };
-
-    virtual void onStandartError(){
-        qDebug("Iperf : standartError (%s): %s", qPrintable(getUuid()), qPrintable(process->readAllStandardError()));
     };
 
     virtual void onStarted(){
