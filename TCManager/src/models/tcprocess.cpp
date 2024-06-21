@@ -42,7 +42,8 @@ TCProcess::TCProcess(QUuid processUuid)
 
             QJsonObject body;
             body["uuid"] = getUuid();
-            body["status"] = "вававава";
+            body["from"] = "TCManager";
+            body["msg"] = "Процесс завершился";
 
             error = process->readAllStandardError();
             if(!error.isEmpty())
