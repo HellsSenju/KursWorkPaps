@@ -4,6 +4,7 @@
 #include <QSettings>
 #include <QUuid>
 
+#include "myapplication.h"
 #include "processespool.h"
 #include "httplistener.h"
 #include "global.h"
@@ -47,7 +48,8 @@ QString searchConfigFile()
 
 int main(int argc, char *argv[])
 {
-    QCoreApplication app(argc, argv);
+//    QCoreApplication app(argc, argv);
+    MyApplication app(argc, argv);
     app.setApplicationName("TCManager");
 
     // регистрация пользовательского типа

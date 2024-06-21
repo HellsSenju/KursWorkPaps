@@ -8,7 +8,12 @@
 #include <QHostAddress>
 #include <QSettings>
 #include <QTcpSocket>
+#include <QString>
+#include <QByteArray>
+#include <QMap>
+#include <QThread>
 
+#include "httpsender.h"
 
 class Network : public QObject
 {
@@ -23,26 +28,33 @@ public:
 
     Response* post(const QString &url, const QString &ip, int port, QJsonObject body);
 
-    Response *post(const QString &url, QJsonObject body);
+    void post(const QString &url, QJsonObject body);
 
     QByteArray configureRequest(const QString& url,
                                 const QString& ip,
                                 int port,
-                                const QString& body);
+                                QString body);
+
+    QByteArray configureHeaders(const QString& url,
+                                const QString& ip,
+                                int port);
 
     QJsonObject parseRequest(const QString& in);
 
 
 public slots:
-
+    void onResult(QString res);
+    void onThreadFinished();
 
 signals:
     void onReady();
+
 
 private:
     QString ip;
     int port;
 
+    QMap<QThread*, HttpSender*> pool;
 
 };
 

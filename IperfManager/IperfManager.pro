@@ -11,6 +11,7 @@ OTHER_FILES += etc/* logs/* otherFiles/*
 SOURCES += \
     src/global.cpp \
     src/globalnetwork.cpp \
+    src/httpsender.cpp \
     src/iperfmanager.cpp \
     src/main.cpp \
     src/models/iperfclient.cpp \
@@ -29,6 +30,7 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 HEADERS += \
     src/global.h \
     src/globalnetwork.h \
+    src/httpsender.h \
     src/iperfmanager.h \
     src/models/abstractiperf.h \
     src/models/iperfclient.h \

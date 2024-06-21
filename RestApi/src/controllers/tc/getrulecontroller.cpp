@@ -26,6 +26,7 @@ void GetRuleController::service(HttpRequest &request, HttpResponse &response)
     int port = req.value("port").toInt();
 
     QJsonObject body{
+        {"ffe", "ifgdigpfdigpdifgpifdgpoifd"},
         {"uuid", req.value("uuid")},
         {"command", req.value("command")}
     };
