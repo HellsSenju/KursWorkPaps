@@ -3,7 +3,7 @@
 
 #include "httprequesthandler.h"
 #include "../global.h"
-
+#include "../globalnetwork.h"
 
 using namespace stefanfrings;
 

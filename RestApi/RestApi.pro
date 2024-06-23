@@ -21,6 +21,7 @@ SOURCES += \
         src/controllers/iperf/stopiperfcontroller.cpp \
         src/controllers/requestmapper.cpp \
         src/databaseconnection.cpp \
+        src/globalnetwork.cpp \
         src/main.cpp\
         src/global.cpp
 
@@ -43,7 +44,8 @@ HEADERS += \
         src/controllers/iperf/stopiperfcontroller.h \
         src/controllers/requestmapper.h \
         src/databaseconnection.h \
-        src/global.h
+        src/global.h \
+        src/globalnetwork.h
 
 include(../QtWebApp/httpserver/httpserver.pri)
 include(../QtWebApp/logging/logging.pri)
@@ -53,3 +55,10 @@ include(../QtWebApp/logging/logging.pri)
 
 DISTFILES += \
     logs/uuids
+
+win32:CONFIG(release, debug|release): LIBS += -L$$PWD/'../build/ NetworkLibDebug/release/' -lNetworkLib
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/'../build/ NetworkLibDebug/debug/' -lNetworkLib
+else:unix: LIBS += -L$$PWD/'../build/ NetworkLibDebug/' -lNetworkLib
+
+INCLUDEPATH += $$PWD/../NetworkLib
+DEPENDPATH += $$PWD/../NetworkLib

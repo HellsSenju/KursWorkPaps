@@ -33,17 +33,21 @@ TCProcess::TCProcess(QUuid processUuid)
                exitCode,
                exitStatus
         );
-        if(exitStatus == 0)
+
+        if(exitStatus == 0){
             setState(ProcessState::Finished);
-        else
+        }
+        else{
             setState(ProcessState::Crashed);
+        }
 
         if(!stoped){
 
             QJsonObject body;
             body["uuid"] = getUuid();
             body["from"] = "TCManager";
-            body["msg"] = "Процесс завершился";
+            body["exitStatus"] = exitStatus;
+            body["exitCode"] = exitCode;
 
             error = process->readAllStandardError();
             if(!error.isEmpty())

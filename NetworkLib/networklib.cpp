@@ -1,5 +1,11 @@
 #include "networklib.h"
 
-NetworkLib::NetworkLib()
+NetworkLib::NetworkLib():
+    network()
 {
+}
+
+NetworkLib::~NetworkLib()
+{
+    network->deleteLater();
 }

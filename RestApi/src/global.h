@@ -4,8 +4,8 @@
 #include "httpsessionstore.h"
 #include "staticfilecontroller.h"
 #include "filelogger.h"
-
-#include <QNetworkAccessManager>
+#include "databaseconnection.h"
+#include "network.h"
 
 using namespace stefanfrings;
 
@@ -24,7 +24,8 @@ extern  StaticFileController* staticFileController;
 /** Redirects log messages to a file */
 extern  FileLogger* logger;
 
+/** manager for db*/
+extern DataBaseConnection* db;
 
-extern QNetworkAccessManager* manager;
 
 #endif // GLOBAL_H

@@ -7,6 +7,7 @@
 #include "filelogger.h"
 #include "processespool.h"
 
+
 using namespace stefanfrings;
 
 /**
@@ -23,6 +24,9 @@ extern  StaticFileController* staticFileController;
 /** Redirects log messages to a file */
 extern  FileLogger* logger;
 
+/**  meneger for processes */
 extern ProcessesPool* pool;
+
+
 
 #endif // GLOBAL_H

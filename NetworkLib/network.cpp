@@ -1,5 +1,7 @@
 #include "network.h"
 
+#include <QUuid>
+
 Network::Network(const QSettings* settings, QObject *parent)
     : QObject{parent}
 {
@@ -9,10 +11,9 @@ Network::Network(const QSettings* settings, QObject *parent)
     port = settings->value("port").toInt();
 }
 
-
-QThread* Network::post(const QString& url, const QString& ip, int port, QJsonObject body)
+QThread *Network::post(QString url, QString ip, int port, QJsonObject body)
 {
-    QThread *thread = new QThread();
+    QThread* thread = new QThread();
     HttpSender *sender = new HttpSender(configureRequest(url,
                                                          ip,
                                                          port,
@@ -20,10 +21,10 @@ QThread* Network::post(const QString& url, const QString& ip, int port, QJsonObj
                                         ip,
                                         port);
 
-    connect(thread, &QThread::started, sender, &HttpSender::run);
     connect(sender, &HttpSender::finished, thread, &QThread::terminate);
-    connect(sender, &HttpSender::hadResult, this, &Network::onResult, Qt::ConnectionType::QueuedConnection);
-    connect(thread, &QThread::finished, this, &Network::onThreadFinished);
+    connect(sender, &HttpSender::hadResult, this, &Network::onResult,
+            Qt::ConnectionType::QueuedConnection);
+    connect(thread, &QThread::started, sender, &HttpSender::run);
 
     pool.insert(thread, sender);
 
@@ -43,12 +44,26 @@ void Network::post(const QString &url, QJsonObject body)
 
     connect(thread, &QThread::started, sender, &HttpSender::run);
     connect(sender, &HttpSender::finished, thread, &QThread::terminate);
-    connect(sender, &HttpSender::hadResult, this, &Network::onResult, Qt::ConnectionType::QueuedConnection);
+    connect(sender, &HttpSender::hadResult, this, &Network::onResult,
+            Qt::ConnectionType::QueuedConnection);
     connect(thread, &QThread::finished, this, &Network::onThreadFinished);
 
     pool.insert(thread, sender);
 
     thread->start();
+}
+
+void Network::deleteThread(QThread *thread)
+{
+    HttpSender* sender = pool.value(thread);
+
+    disconnect(thread, &QThread::started, sender, &HttpSender::run);
+    disconnect(sender, &HttpSender::finished, thread, &QThread::terminate);
+    disconnect(sender, &HttpSender::hadResult, this, &Network::onResult);
+
+    sender->deleteLater();
+    pool.remove(thread);
+    thread->deleteLater();
 }
 
 void Network::onResult(QString res)
@@ -65,6 +80,7 @@ void Network::onThreadFinished()
     disconnect(thread, &QThread::started, sender, &HttpSender::run);
     disconnect(sender, &HttpSender::finished, thread, &QThread::terminate);
     disconnect(sender, &HttpSender::hadResult, this, &Network::onResult);
+    disconnect(thread, &QThread::finished, this, &Network::onThreadFinished);
 
     sender->deleteLater();
     pool.remove(thread);

@@ -6,7 +6,6 @@ IperfServer::IperfServer(QUuid processUuid)
     uuid = processUuid;
     server = true;
 
-    connect(process, &QProcess::started, this, &IperfServer::onStarted);
     connect(process, &QProcess::readyReadStandardOutput, this, &IperfServer::onStandartOutput);
     connect(process, &QProcess::readyReadStandardError, this, &IperfServer::onStandartError);
     connect(process, &QProcess::errorOccurred, this, &IperfServer::onErrorOccurred);
@@ -19,11 +18,10 @@ IperfServer::IperfServer(QUuid processUuid)
             break;
         case 1: //starting
             qDebug("IperfServer : Процесс запускается, но программа еще не была вызвана %s", qPrintable(getUuid()));
-//            setState(ProcessState::Starting);
             break;
         case 2: // running
-//            qDebug("stateChanged : %s : Процесс запущен и готов к чтению и записи", qPrintable(uuid.toString()));
-
+            qDebug("IperfServer : %s : Процесс запущен и готов к чтению и записи", qPrintable(uuid.toString()));
+            setState(ProcessState::Running);
             break;
   }
     });
@@ -36,16 +34,25 @@ IperfServer::IperfServer(QUuid processUuid)
                exitCode,
                exitStatus
         );
-        setState(ProcessState::Finished);
+        if(exitStatus == 0){
+            setState(ProcessState::Finished);
+        }
+        else{
+            setState(ProcessState::Crashed);
+        }
 
         if(!stoped){
             QJsonObject body{
-                {"IperfManager", "Процесс был завершен"}
+                {"uuid", getUuid()},
+                {"from", "IperfManager"},
+                {"exitStatus", exitStatus},
+                {"exitCode", exitCode}
             };
+
             if(!error.isEmpty())
                 body["error"] = error;
 
-            network->post("/iperf", body);
+            network->post("/iperf/finished", body);
             emit deleteProcess(getUuid());
         }
     });

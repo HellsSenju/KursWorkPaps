@@ -80,9 +80,13 @@ protected slots:
 
     virtual void onStandartError(){
         QString temp = process->readAllStandardError();
-        if(temp.contains("Error"))
-            error = temp;
+        error.append(temp + " ");
         qDebug("standartError (%s): %s", qPrintable(getUuid()), qPrintable(temp));
+    };
+
+    virtual void onStarted(){
+        qDebug("Iperf : Процесс запущен и готов к чтению и записи %s", qPrintable(uuid.toString()));
+        setState(ProcessState::Running);
     };
 
     virtual void onErrorOccurred(QProcess::ProcessError error){
@@ -94,19 +98,10 @@ protected slots:
 
         case QProcess::ProcessError::Crashed:
             qDebug("Iperf : errorOccurred : %s : Crashed", qPrintable(getUuid()));
-            emit stateChanged(ProcessState::Crashed);
             break;
 
         case QProcess::ProcessError::Timedout:
             qDebug("Iperf : errorOccurred : %s : Timedout", qPrintable(getUuid()));
-            break;
-
-        case QProcess::ProcessError::ReadError:
-            qDebug("Iperf : errorOccurred : %s : ReadError", qPrintable(getUuid()));
-            break;
-
-        case QProcess::ProcessError::WriteError:
-            qDebug("Iperf : errorOccurred : %s : WriteError", qPrintable(getUuid()));
             break;
 
         case QProcess::ProcessError::UnknownError:
@@ -117,11 +112,6 @@ protected slots:
             qDebug("Iperf : errorOccurred : %s : default", qPrintable(getUuid()));
             break;
         }
-    };
-
-    virtual void onStarted(){
-        qDebug("Iperf : Процесс запущен и готов к чтению и записи %s", qPrintable(uuid.toString()));
-        setState(ProcessState::Running);
     };
 
 signals:

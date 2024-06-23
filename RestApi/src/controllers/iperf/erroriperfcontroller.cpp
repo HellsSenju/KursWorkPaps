@@ -8,7 +8,7 @@ ErrorIperfController::ErrorIperfController()
 void ErrorIperfController::service(HttpRequest &request, HttpResponse &response)
 {
     qDebug() << request.getBody();
-    QJsonObject req =  parseRequest(request.getBody());
+    QJsonObject req =  network->parseRequest(request.getBody());
     QString uuid = req.value("uuid").toString();
     QString error = "";
     if(req.contains("error"))

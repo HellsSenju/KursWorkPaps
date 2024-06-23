@@ -5,6 +5,7 @@
 
 #include "httplistener.h"
 #include "global.h"
+#include "globalnetwork.h"
 #include "controllers/requestmapper.h"
 
 QString searchConfigFile()
@@ -72,15 +73,16 @@ int main(int argc, char *argv[])
     listenerSettings->beginGroup("listener");
     new HttpListener(listenerSettings, new RequestMapper(&app), &app);
 
+    // настройка DataBaseConnection
+    QSettings* dbSettings = new QSettings(configFileName,QSettings::IniFormat, &app);
+    dbSettings->beginGroup("db");
+    db = new DataBaseConnection(dbSettings, &app);
+    db->connect();
 
-    manager = new QNetworkAccessManager(&app);
-
-
-//    qDebug() << QUuid::createUuid().toString();
-//    qDebug() << QUuid::createUuid().toString();
-//    qDebug() << QUuid::createUuid().toString();
-//    qDebug() << QUuid::createUuid().toString();
-//    qDebug() << QUuid::createUuid().toString();
+    // настройка Network
+    QSettings* apiSettings = new QSettings(configFileName,QSettings::IniFormat, &app);
+    apiSettings->beginGroup("api");
+    network = new Network(apiSettings);
 
     qWarning("Application has started");
     return app.exec();

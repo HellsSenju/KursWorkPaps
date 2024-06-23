@@ -8,7 +8,7 @@ DeleteController::DeleteController()
 void DeleteController::service(HttpRequest &request, HttpResponse &response)
 {
     qDebug() << request.getBody();
-    QJsonObject body =  parseRequest(request.getBody());
+    QJsonObject body =  network->parseRequest(request.getBody());
     QString uuid = body["uuid"].toString();
 
     QTimer timer;

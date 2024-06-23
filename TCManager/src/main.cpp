@@ -8,8 +8,8 @@
 #include "processespool.h"
 #include "httplistener.h"
 #include "global.h"
+#include "globalnetwork.h"
 #include "controllers/requestmapper.h"
-#include "../IperfManager/src/globalnetwork.h"
 
 QString searchConfigFile()
 {

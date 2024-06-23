@@ -2,7 +2,8 @@
 #define STOPIPERFCONTROLLER_H
 
 #include "httprequesthandler.h"
-
+#include "../../globalnetwork.h"
+#include "../../global.h"
 
 using namespace stefanfrings;
 

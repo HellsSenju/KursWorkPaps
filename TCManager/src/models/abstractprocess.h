@@ -11,8 +11,7 @@
 #include <QJsonArray>
 #include <QJsonDocument>
 
-#include "../IperfManager/src/globalnetwork.h"
-
+#include "../globalnetwork.h"
 
 enum ProcessState {Starting, Running, Finished, Crashed, FailedToStart};
 Q_DECLARE_METATYPE(ProcessState)
@@ -95,7 +94,6 @@ protected slots:
 
         case 1:
             qDebug("errorOccurred : %s : Crashed", qPrintable(getUuid()));
-            setState(ProcessState::Crashed);
             break;
 
         case 2:

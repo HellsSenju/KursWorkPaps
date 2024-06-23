@@ -2,7 +2,8 @@
 #define STARTIPERFCONTROLLER_H
 
 #include "httprequesthandler.h"
-
+#include "../../globalnetwork.h"
+#include "../../global.h"
 
 using namespace stefanfrings;
 
@@ -17,9 +18,7 @@ public:
     void service(HttpRequest& request, HttpResponse& response);
 
 private:
-
     bool checkRequest(QJsonObject request);
-    QString configureParams(QJsonObject request);
 };
 
 #endif // STARTIPERFCONTROLLER_H

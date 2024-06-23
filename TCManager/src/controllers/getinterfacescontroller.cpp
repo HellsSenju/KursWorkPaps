@@ -8,7 +8,7 @@ GetInterfacesController::GetInterfacesController()
 void GetInterfacesController::service(HttpRequest &request, HttpResponse &response)
 {
     qDebug() << "GetInterfacesController : " << request.getBody();
-    QJsonObject body =  parseRequest(request.getBody());
+    QJsonObject body =  network->parseRequest(request.getBody());
     QString uuid = body["uuid"].toString();
 
     QTimer timer;

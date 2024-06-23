@@ -18,9 +18,7 @@ SOURCES += \
     src/models/iperfserver.cpp \
     src/controllers/requestmapper.cpp \
     src/controllers/startcontroller.cpp \
-    src/controllers/statisticcontroller.cpp \
-    src/controllers/stopcontroller.cpp \
-    src/network.cpp
+    src/controllers/stopcontroller.cpp
 
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
@@ -37,9 +35,7 @@ HEADERS += \
     src/models/iperfserver.h \
     src/controllers/requestmapper.h \
     src/controllers/startcontroller.h \
-    src/controllers/statisticcontroller.h \
-    src/controllers/stopcontroller.h \
-    src/network.h
+    src/controllers/stopcontroller.h
 
 include(../QtWebApp/httpserver/httpserver.pri)
 include(../QtWebApp/logging/logging.pri)
@@ -48,3 +44,10 @@ include(../QtWebApp/logging/logging.pri)
 
 DISTFILES += \
     logs/uuids
+
+win32:CONFIG(release, debug|release): LIBS += -L$$PWD/'../build/ NetworkLibDebug/release/' -lNetworkLib
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/'../build/ NetworkLibDebug/debug/' -lNetworkLib
+else:unix: LIBS += -L$$PWD/'../build/ NetworkLibDebug/' -lNetworkLib
+
+INCLUDEPATH += $$PWD/../NetworkLib
+DEPENDPATH += $$PWD/../NetworkLib

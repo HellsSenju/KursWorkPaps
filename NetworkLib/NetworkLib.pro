@@ -1,4 +1,5 @@
 QT -= gui
+QT += core network
 
 TEMPLATE = lib
 DEFINES += NETWORKLIB_LIBRARY
@@ -10,11 +11,12 @@ CONFIG += c++11
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-    networklib.cpp
-
+    httpsender.cpp \
+    network.cpp
 HEADERS += \
     NetworkLib_global.h \
-    networklib.h
+    httpsender.h \
+    network.h
 
 # Default rules for deployment.
 unix {

@@ -4,24 +4,30 @@ DataBaseConnection::DataBaseConnection(QSettings *settings, QObject *parent)
     : QObject{parent}
 {
     this->settings = settings;
+    dbName = settings->value("name").toString();
+}
+
+DataBaseConnection::~DataBaseConnection()
+{
+    settings->deleteLater();
 }
 
 void DataBaseConnection::connect()
 {
     // добавление нового соединения с бд, где первый аргумент - тип драйвера, второй - название соединения
-    db = QSqlDatabase::addDatabase("QPSQL", settings->value("name").toString());
+    db = QSqlDatabase::addDatabase("QPSQL", dbName);
     // задание host name для соединения (должно быть задано до открытия соединения) - ip
     db.setHostName(settings->value("host").toString());
     // название базы данных
-    db.setDatabaseName(settings->value("name").toString());
+    db.setDatabaseName(dbName);
     // имя пользователя
     db.setUserName(settings->value("userName").toString());
     //пароль
     db.setPassword(settings->value("password").toString());
 
     //открытие соединения
-    if(db.open()) qDebug("DataBaseConnection : db open");
-    else qDebug() << db.lastError().text();
+    if(db.open()) qDebug("DataBaseConnection : соединение открыто");
+    else qDebug("DataBaseConnection : нет соединения. Ошибка %s", qPrintable(db.lastError().text()));
 }
 
 QJsonObject DataBaseConnection::get(QString dbName, QString SQL, QJsonArray injections)
@@ -64,8 +70,10 @@ QJsonObject DataBaseConnection::get(QString dbName, QString SQL, QJsonArray inje
     return obj;
 }
 
-bool DataBaseConnection::insert(QString dbName, QString tableName, QJsonObject injections)
+bool DataBaseConnection::insert(QString tableName, QJsonObject injections)
 {
+    QSqlQuery query = QSqlQuery(db.database(dbName));
+
     QSqlQuery q = QSqlQuery(db.database(dbName));
     QString SQL = QString("INSERT INTO %1 (id, name, status) VALUES (?, ?, ?)").arg(tableName);
 
@@ -92,6 +100,46 @@ bool DataBaseConnection::insert(QString dbName, QString tableName, QJsonObject i
         return false;
     }
     return true;
+}
+
+void DataBaseConnection::insertNotification(QString processId,
+                                             QString manager,
+                                             QString information,
+                                             QString error)
+{
+    QSqlQuery query = QSqlQuery(db.database(dbName));
+    QString SQL;
+
+    // no error
+    if(error.isEmpty()){
+        qDebug() << "no error";
+        SQL = QString("INSERT INTO %1 (process_id, information, manager) VALUES (?, ?, ?)")
+                .arg("notification_2");
+    }
+    else{
+        SQL = QString("INSERT INTO %1 (process_id, information, error_msg, manager) VALUES (?, ?, ?, ?)")
+                .arg("notification_2");
+    }
+
+    if(!query.prepare(SQL)) {
+        qDebug() << "with error";
+        qDebug("DataBaseConnection : Prepare fasle. %s", qPrintable(query.lastError().text()));
+        return;
+    }
+
+    query.addBindValue(processId);
+    query.addBindValue(information);
+    if(!error.isEmpty())
+        query.addBindValue(error);
+    query.addBindValue(manager);
+
+    if(!query.exec()){
+        qDebug("Запрос: %s", qPrintable(query.lastQuery()));
+        qDebug("Запрос не выполнился. Ошибка: %s", qPrintable(query.lastError().text()));
+        return;
+    }
+
+    qDebug("Запрос: %s", qPrintable(query.lastQuery()));
 }
 
 bool DataBaseConnection::update(QString dbName, QString tableName, QJsonObject values, QString filter)

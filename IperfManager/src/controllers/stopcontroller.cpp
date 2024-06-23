@@ -8,7 +8,7 @@ StopController::StopController()
 void StopController::service(HttpRequest &request, HttpResponse &response)
 {
     qDebug() << request.getBody();
-    QJsonObject req =  parseRequest(request.getBody());
+    QJsonObject req =  network->parseRequest(request.getBody());
 
     QString uuid = req.value("uuid").toString();
 
@@ -30,40 +30,43 @@ void StopController::service(HttpRequest &request, HttpResponse &response)
         response.write(QJsonDocument(object).toJson(QJsonDocument::Compact),true);
         return;
     }
+    else{
+        manager->stopProcess(uuid);
 
-    manager->stopProcess(uuid);
+        timer.start(10000); //10 sec
+        loop.exec();
 
-    timer.start(10000); //10 sec
-    loop.exec();
+        if(!timer.isActive()){
+            QJsonObject object{
+                {"IperfManager", "Не пришел сигнал от процесса."}
+            };
 
-    if(!timer.isActive()){
-        QJsonObject object{
-            {"IperfManager", "Не пришел сигнал от процесса."}
-        };
+            response.write(QJsonDocument(object).toJson(QJsonDocument::Compact),true);
+            return;
+        }
 
-        response.write(QJsonDocument(object).toJson(QJsonDocument::Compact),true);
-        return;
-    }
+        switch (manager->getProcessStatus(uuid)) {
+        case ProcessState::Finished:
+        {
+            QJsonObject object{
+                {"IperfManager", "Процесс успешно остановлен."}
+            };
 
-    switch (manager->getProcessStatus(uuid)) {
-    case ProcessState::Finished:
-    {
-        QJsonObject object{
-            {"IperfManager", "Процесс успешно остановлен."}
-        };
+            response.write(QJsonDocument(object).toJson(QJsonDocument::Compact), true);
+         }
+            break;
 
-        response.write(QJsonDocument(object).toJson(QJsonDocument::Compact), true);
-     }
-        break;
+        default:
+            QJsonObject object{
+                {"IperfManager", "Неизвестная ошибка."}
+            };
 
-    default:
-        QJsonObject object{
-            {"IperfManager", "Неизвестная ошибка."}
-        };
-
-        response.write(QJsonDocument(object).toJson(QJsonDocument::Compact), true);
-        break;
+            response.write(QJsonDocument(object).toJson(QJsonDocument::Compact), true);
+            break;
+        }
     }
 
     manager->deleteProcess(uuid);
+    disconnect( manager, &IperfManager::iperfChanged, &loop, &QEventLoop::quit);
+    disconnect( &timer, &QTimer::timeout, &loop, &QEventLoop::quit );
 }

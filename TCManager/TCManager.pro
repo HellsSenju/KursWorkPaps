@@ -10,15 +10,13 @@ OTHER_FILES += etc/* logs/*
 
 
 SOURCES += \
-    ../IperfManager/src/httpsender.cpp \
-    ../IperfManager/src/network.cpp \
-    ../IperfManager/src/globalnetwork.cpp \
     src/controllers/addcontroller.cpp \
     src/controllers/deletecontroller.cpp \
     src/controllers/getcontroller.cpp \
     src/controllers/getinterfacescontroller.cpp \
     src/controllers/updatecontroller.cpp \
     src/controllers/requestmapper.cpp \
+    src/globalnetwork.cpp \
     src/models/process.cpp \
     src/models/tcprocess.cpp \
     src/myapplication.cpp \
@@ -32,15 +30,13 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 HEADERS += \
-    ../IperfManager/src/httpsender.h \
-    ../IperfManager/src/network.h \
-    ../IperfManager/src/globalnetwork.h \
     src/controllers/addcontroller.h \
     src/controllers/deletecontroller.h \
     src/controllers/getcontroller.h \
     src/controllers/getinterfacescontroller.h \
     src/controllers/updatecontroller.h \
     src/controllers/requestmapper.h \
+    src/globalnetwork.h \
     src/models/abstractprocess.h \
     src/models/process.h \
     src/models/tcprocess.h\
@@ -55,3 +51,10 @@ include(../QtWebApp/logging/logging.pri)
 
 DISTFILES += \
     logs/uuids
+
+win32:CONFIG(release, debug|release): LIBS += -L$$PWD/'../build/ NetworkLibDebug/release/' -lNetworkLib
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/'../build/ NetworkLibDebug/debug/' -lNetworkLib
+else:unix: LIBS += -L$$PWD/'../build/ NetworkLibDebug/' -lNetworkLib
+
+INCLUDEPATH += $$PWD/../NetworkLib
+DEPENDPATH += $$PWD/../NetworkLib
