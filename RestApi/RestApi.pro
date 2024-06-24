@@ -12,6 +12,7 @@ SOURCES += \
         src/controllers/iperf/finishediperfcontroller.cpp \
         src/controllers/iperf/statisticfromiperfcontroller.cpp \
         src/controllers/notificationscontroller.cpp \
+        src/controllers/statisticcontroller.cpp \
         src/controllers/tc/addrulecontroller.cpp \
         src/controllers/tc/deleterulecontroller.cpp \
         src/controllers/tc/getrulecontroller.cpp \
@@ -35,6 +36,7 @@ HEADERS += \
         src/controllers/iperf/finishediperfcontroller.h \
         src/controllers/iperf/statisticfromiperfcontroller.h \
         src/controllers/notificationscontroller.h \
+        src/controllers/statisticcontroller.h \
         src/controllers/tc/addrulecontroller.h \
         src/controllers/tc/deleterulecontroller.h \
         src/controllers/tc/getrulecontroller.h \

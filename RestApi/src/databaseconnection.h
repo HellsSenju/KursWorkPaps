@@ -31,6 +31,9 @@ public:
      *  (если timestamp не указан, берутся уведомления от послденего обращения)*/
     QJsonObject getNotifications(QSqlQuery query, QString timestamp = "");
 
+    /** Получение статистических данных*/
+    QJsonObject getStatistic(QSqlQuery query, QString from, QString to);
+
     /** Добавление записи уведомления в базу данных*/
     QJsonObject insertNotification(QSqlQuery query, QString processId, QString manager, QString information, QString error);
 

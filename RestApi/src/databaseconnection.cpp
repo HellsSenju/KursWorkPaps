@@ -73,13 +73,53 @@ QJsonObject DataBaseConnection::getNotifications(QSqlQuery query, QString timest
             else
                 buff.insert(query.record().fieldName(i), query.record().value(i).toJsonValue());
         }
-        obj.insert(buff.value("process_id").toString(), buff);
+        obj.insert(QString::number(j), buff);
     }
 
     if(obj.size() == 0)
         obj.insert("msg", "Новых уведомлений нет.");
 
     setNewLastTime(QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss"));
+    return obj;
+}
+
+QJsonObject DataBaseConnection::getStatistic(QSqlQuery query, QString from, QString to)
+{
+    QJsonObject obj;
+
+    QString SQL = QString("SELECT process_id, interval_, transfer, brandwidth, jitter, lost, total, lost_total, creation_time "
+                          "FROM iperf_statistic WHERE iperf_statistic.creation_time > '%1' "
+                          "AND iperf_statistic.creation_time < '%2'")
+            .arg(from).arg(to);
+
+    if(!query.prepare(SQL)) {
+        qDebug("DataBaseConnection : Prepare fasle. %s", qPrintable(query.lastError().text()));
+        obj.insert("error", query.lastError().text());
+        return obj;
+    }
+
+    if(!query.exec()){
+        qDebug("DataBaseConnection : Execution error. %s", qPrintable(query.lastError().text()));
+        obj.insert("error", query.lastError().text());
+        return obj;
+    }
+
+    //забираются данные из ответы
+    for(int j = 0; query.next(); j++){
+        QJsonObject buff;
+        for(int i = 0; i < query.record().count(); i++){
+            QString fieldName = query.record().fieldName(i);
+            if(fieldName == "creation_time")
+                buff.insert(query.record().fieldName(i), query.record().value(i).toDateTime().toString("yyyy-MM-dd hh:mm:ss"));
+            else
+                buff.insert(query.record().fieldName(i), query.record().value(i).toJsonValue());
+        }
+        obj.insert(QString::number(j), buff);
+    }
+
+    if(obj.size() == 0)
+        obj.insert("msg", QString("Нет записей в промежутке с %1 по %2").arg(from).arg(to));
+
     return obj;
 }
 

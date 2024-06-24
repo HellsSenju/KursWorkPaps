@@ -13,6 +13,7 @@
 #include "./tc/deleterulecontroller.h"
 
 #include "notificationscontroller.h"
+#include "statisticcontroller.h"
 
 
 RequestMapper::RequestMapper(QObject* parent)
@@ -43,6 +44,9 @@ void RequestMapper::service(HttpRequest& request, HttpResponse& response)
 
     else if (path.startsWith("/iperf/postStats"))
         StatisticFromIperfController().service(request, response);
+
+    else if (path.startsWith("/iperf/getStats"))
+        StatisticController().service(request, response);
 
     // получение информации о завершении процесса
     else if (path.startsWith("/iperf/finished"))
