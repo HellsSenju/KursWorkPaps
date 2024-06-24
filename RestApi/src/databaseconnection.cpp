@@ -1,10 +1,14 @@
 #include "databaseconnection.h"
 
-DataBaseConnection::DataBaseConnection(QSettings *settings, QObject *parent)
+DataBaseConnection::DataBaseConnection(const QString &helpersFile, QSettings *settings, QObject *parent)
     : QObject{parent}
 {
     this->settings = settings;
     dbName = settings->value("name").toString();
+    hostName= settings->value("host").toString();
+    user= settings->value("userName").toString();
+    password= settings->value("password").toString();
+    helperFile = helpersFile;
 }
 
 DataBaseConnection::~DataBaseConnection()
@@ -17,114 +21,90 @@ void DataBaseConnection::connect()
     // добавление нового соединения с бд, где первый аргумент - тип драйвера, второй - название соединения
     db = QSqlDatabase::addDatabase("QPSQL", dbName);
     // задание host name для соединения (должно быть задано до открытия соединения) - ip
-    db.setHostName(settings->value("host").toString());
+    db.setHostName(hostName);
     // название базы данных
     db.setDatabaseName(dbName);
     // имя пользователя
-    db.setUserName(settings->value("userName").toString());
+    db.setUserName(user);
     //пароль
-    db.setPassword(settings->value("password").toString());
+    db.setPassword(password);
 
     //открытие соединения
     if(db.open()) qDebug("DataBaseConnection : соединение открыто");
     else qDebug("DataBaseConnection : нет соединения. Ошибка %s", qPrintable(db.lastError().text()));
 }
 
-QJsonObject DataBaseConnection::get(QString dbName, QString SQL, QJsonArray injections)
+
+QJsonObject DataBaseConnection::getNotifications(QSqlQuery query, QString timestamp)
 {
-    // экземпляр sql запроса к определенной бд
-    QSqlQuery q = QSqlQuery(db.database(dbName));
     QJsonObject obj;
-    // подготовка запроса к исполнению
-    if(!q.prepare(SQL)) {
-        obj.insert("error", q.lastError().text());
+
+    if(timestamp.isEmpty())
+        timestamp = getLastTime();
+
+    if(timestamp.contains("error")){
+        obj.insert("error", timestamp);
         return obj;
     }
 
-    // добавление в запрос аргументов (для большей безопасности)
-    for(int i = 0; i < injections.size(); i++)
-    {
-        QJsonValue value = injections[i];
-        if(value.isString())
-            q.addBindValue(value.toString());
-        if(value.isDouble())
-            q.addBindValue(value.toDouble());
+    QString SQL = QString("SELECT process_id, information, error_msg, manager, creation_time "
+                          "FROM notification_2 WHERE notification_2.creation_time > '%1' ")
+            .arg(timestamp);
+
+    if(!query.prepare(SQL)) {
+        qDebug("DataBaseConnection : Prepare fasle. %s", qPrintable(query.lastError().text()));
+        obj.insert("error", query.lastError().text());
+        return obj;
     }
 
-    // выполнение запроса
-    if(!q.exec()){
-        obj.insert("error", q.lastError().text());
+    if(!query.exec()){
+        qDebug("DataBaseConnection : Execution error. %s", qPrintable(query.lastError().text()));
+        obj.insert("error", query.lastError().text());
         return obj;
     }
 
     //забираются данные из ответы
-    for(int j = 0; q.next(); j++){
+    for(int j = 0; query.next(); j++){
         QJsonObject buff;
-
-        for(int i = 0; i < q.record().count(); i++){
-            buff.insert(q.record().fieldName(i), q.record().value(i).toJsonValue());
+        for(int i = 0; i < query.record().count(); i++){
+            QString fieldName = query.record().fieldName(i);
+            if(fieldName == "creation_time")
+                buff.insert(query.record().fieldName(i), query.record().value(i).toDateTime().toString("yyyy-MM-dd hh:mm:ss"));
+            else
+                buff.insert(query.record().fieldName(i), query.record().value(i).toJsonValue());
         }
-        obj.insert(QString::number(j), buff);
+        obj.insert(buff.value("process_id").toString(), buff);
     }
 
     return obj;
 }
 
-bool DataBaseConnection::insert(QString tableName, QJsonObject injections)
-{
-    QSqlQuery query = QSqlQuery(db.database(dbName));
 
-    QSqlQuery q = QSqlQuery(db.database(dbName));
-    QString SQL = QString("INSERT INTO %1 (id, name, status) VALUES (?, ?, ?)").arg(tableName);
-
-    if(!q.prepare(SQL)) {
-        qDebug() << "prepare fasle";
-        qDebug() << q.lastError().text();
-        return false;
-    }
-
-    for(int i = 0; i < injections.size(); i++)
-    {
-        QJsonObject object = injections[QString::number(i)].toObject();
-        for(QString prop : object.keys()){
-            if(object[prop].isString())
-                q.addBindValue(object[prop].toString());
-            else if(object[prop].isDouble())
-                q.addBindValue(object[prop].toDouble());
-        }
-    }
-
-    if(!q.exec()){
-        qDebug() << "exec fasle";
-        qDebug() << q.lastError().text();
-        return false;
-    }
-    return true;
-}
-
-void DataBaseConnection::insertNotification(QString processId,
+QJsonObject DataBaseConnection::insertNotification(QString processId,
                                              QString manager,
                                              QString information,
                                              QString error)
 {
     QSqlQuery query = QSqlQuery(db.database(dbName));
     QString SQL;
+    QJsonObject obj;
 
     // no error
     if(error.isEmpty()){
         qDebug() << "no error";
-        SQL = QString("INSERT INTO %1 (process_id, information, manager) VALUES (?, ?, ?)")
+        SQL = QString("INSERT INTO %1 (process_id, information, manager, creation_time) VALUES (?, ?, ?, ?)")
                 .arg("notification_2");
     }
     else{
-        SQL = QString("INSERT INTO %1 (process_id, information, error_msg, manager) VALUES (?, ?, ?, ?)")
+        SQL = QString("INSERT INTO %1 (process_id, information, error_msg, manager, creation_time) VALUES (?, ?, ?, ?, ?)")
                 .arg("notification_2");
     }
 
     if(!query.prepare(SQL)) {
         qDebug() << "with error";
         qDebug("DataBaseConnection : Prepare fasle. %s", qPrintable(query.lastError().text()));
-        return;
+        obj["error"] = query.lastError().text();
+        return obj;
     }
 
     query.addBindValue(processId);
@@ -132,14 +112,67 @@ void DataBaseConnection::insertNotification(QString processId,
     if(!error.isEmpty())
         query.addBindValue(error);
     query.addBindValue(manager);
+    query.addBindValue(QDateTime::currentDateTime());
 
     if(!query.exec()){
         qDebug("Запрос: %s", qPrintable(query.lastQuery()));
         qDebug("Запрос не выполнился. Ошибка: %s", qPrintable(query.lastError().text()));
-        return;
+        obj["error"] = query.lastError().text();
+        return obj;
     }
 
-    qDebug("Запрос: %s", qPrintable(query.lastQuery()));
+    obj["RestApi"] = "Success";
+    return obj;
+}
+
+const QString &DataBaseConnection::getDbName() const
+{
+    return dbName;
+}
+
+const QString &DataBaseConnection::getHostName() const
+{
+    return hostName;
+}
+
+const QString &DataBaseConnection::getUser() const
+{
+    return user;
+}
+
+const QString &DataBaseConnection::getPassword() const
+{
+    return password;
+}
+
+QString DataBaseConnection::getLastTime()
+{
+    QFile file(helperFile);
+
+    if (!file.open(QFile::ReadOnly | QFile::Text)){
+        return "error in file opening";
+    }
+    else{
+        QXmlStreamReader xmlReader;
+        xmlReader.setDevice(&file);
+        xmlReader.readNext();   // Переходит к первому элементу в файле
+        while(!xmlReader.atEnd()){
+            if(xmlReader.isStartElement()){
+                if(xmlReader.name() == "lastNotif"){
+                    return xmlReader.readElementText();
+                }
+            }
+            xmlReader.readNext();
+        }
+    }
+
+    file.close();
+    return "error/ no such token - lastNotif";
+}
+
+void DataBaseConnection::setNewLastTime(QString newTime)
+{
+
 }
 
 bool DataBaseConnection::update(QString dbName, QString tableName, QJsonObject values, QString filter)

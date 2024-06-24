@@ -54,9 +54,6 @@ public:
       @warning This method must be thread safe
     */
     virtual void service(HttpRequest& request, HttpResponse& response);
-
-signals:
-    void insert(QString processId, QString from, QString information, QString error);
 };
 
 } // end of namespace

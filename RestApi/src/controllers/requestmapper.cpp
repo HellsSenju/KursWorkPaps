@@ -13,6 +13,8 @@
 #include "./tc/updaterulecontroller.h"
 #include "./tc/deleterulecontroller.h"
 
+#include "notificationscontroller.h"
+
 
 RequestMapper::RequestMapper(QObject* parent)
     :HttpRequestHandler(parent)
@@ -62,6 +64,9 @@ void RequestMapper::service(HttpRequest& request, HttpResponse& response)
 
     else if (path.startsWith("/tc/interface"))
         GetTcInterfacesController().service(request, response);
+
+    else if (path.startsWith("/getNotif"))
+        NotificationsController().service(request, response);
 
     // All other pathes are mapped to the static file controller.
     // In this case, a single instance is used for multiple requests.

@@ -1,7 +1,7 @@
 TARGET = RestApi
 TEMPLATE = app
 QT -= gui
-QT += core network sql
+QT += core network sql xml
 
 CONFIG += c++11 console
 CONFIG -= app_bundle
@@ -12,6 +12,7 @@ SOURCES += \
         src/controllers/iperf/erroriperfcontroller.cpp \
         src/controllers/iperf/finishediperfcontroller.cpp \
         src/controllers/iperf/fromiperfcontroller.cpp \
+        src/controllers/notificationscontroller.cpp \
         src/controllers/tc/addrulecontroller.cpp \
         src/controllers/tc/deleterulecontroller.cpp \
         src/controllers/tc/getrulecontroller.cpp \
@@ -35,6 +36,7 @@ HEADERS += \
         src/controllers/iperf/erroriperfcontroller.h \
         src/controllers/iperf/finishediperfcontroller.h \
         src/controllers/iperf/fromiperfcontroller.h \
+        src/controllers/notificationscontroller.h \
         src/controllers/tc/addrulecontroller.h \
         src/controllers/tc/deleterulecontroller.h \
         src/controllers/tc/getrulecontroller.h \

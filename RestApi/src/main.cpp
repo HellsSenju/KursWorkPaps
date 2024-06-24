@@ -44,6 +44,43 @@ QString searchConfigFile()
     return nullptr;
 }
 
+QString searchHelperFile()
+{
+    QString binDir=QCoreApplication::applicationDirPath();
+    QString appName=QCoreApplication::applicationName();
+    QString fileName("helpers.xml");
+
+    QStringList searchList;
+    searchList.append(binDir);
+    searchList.append(binDir+"/etc");
+    searchList.append(binDir+"/../etc");
+    searchList.append(binDir+"/../"+appName+"/etc");     // for development with shadow build (Linux)
+    searchList.append(binDir+"/../../"+appName+"/etc");  // for development with shadow build (Windows)
+    searchList.append(QDir::rootPath()+"etc/opt");
+    searchList.append(QDir::rootPath()+"etc");
+
+    foreach (QString dir, searchList)
+    {
+        QFile file(dir+"/"+fileName);
+        if (file.exists())
+        {
+            fileName=QDir(file.fileName()).canonicalPath();
+            qDebug("Using helper file %s",qPrintable(fileName));
+            return fileName;
+        }
+    }
+
+    // not found
+    foreach (QString dir, searchList)
+    {
+        qWarning("%s/%s not found",qPrintable(dir),qPrintable(fileName));
+    }
+    qFatal("Cannot find helper file %s",qPrintable(fileName));
+
+    return nullptr;
+}
+
+
 int main(int argc, char *argv[])
 {
     QCoreApplication app(argc, argv);
@@ -51,6 +88,7 @@ int main(int argc, char *argv[])
 
     // поиск конфигурационного файла
     QString configFileName = searchConfigFile();
+    QString helperFileName = searchHelperFile();
 
     // настройка логирования в файл
     QSettings* logSettings=new QSettings(configFileName,QSettings::IniFormat, &app);
@@ -68,16 +106,17 @@ int main(int argc, char *argv[])
     fileSettings->beginGroup("docroot");
     staticFileController = new StaticFileController(fileSettings, &app);
 
+    // настройка DataBaseConnection
+    QSettings* dbSettings = new QSettings(configFileName, QSettings::IniFormat, &app);
+    dbSettings->beginGroup("db");
+    db = new DataBaseConnection(helperFileName, dbSettings, &app);
+    db->connect();
+
     // настройка и старт TCP listener
     QSettings* listenerSettings = new QSettings(configFileName,QSettings::IniFormat, &app);
     listenerSettings->beginGroup("listener");
     new HttpListener(listenerSettings, new RequestMapper(&app), &app);
 
-    // настройка DataBaseConnection
-    QSettings* dbSettings = new QSettings(configFileName,QSettings::IniFormat, &app);
-    dbSettings->beginGroup("db");
-    db = new DataBaseConnection(dbSettings, &app);
-    db->connect();
 
     // настройка Network
     QSettings* apiSettings = new QSettings(configFileName,QSettings::IniFormat, &app);

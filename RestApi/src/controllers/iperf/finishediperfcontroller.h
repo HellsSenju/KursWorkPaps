@@ -19,7 +19,9 @@ public:
 
     void service(HttpRequest& request, HttpResponse& response);
 
-
+private:
+    /** запрошенная база данных должна принадлежать вызывающему потоку */
+    QSqlDatabase database;
 
 };
 

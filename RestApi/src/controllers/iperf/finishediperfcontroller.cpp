@@ -2,8 +2,16 @@
 
 FinishedIperfController::FinishedIperfController()
 {
-    connect(this, &FinishedIperfController::insert,
-            db, &DataBaseConnection::insertNotification);
+    database = QSqlDatabase::addDatabase("QPSQL", "f");
+    database.setHostName(db->getHostName());
+    database.setDatabaseName(db->getDbName());
+    database.setUserName(db->getUser());
+    database.setPassword(db->getPassword());
+
+    if(database.open())
+        qDebug("FinishedIperfController : соединение открыто");
+    else
+        qDebug("FinishedIperfController : нет соединения. Ошибка %s", qPrintable(database.lastError().text()));
 }
 
 void FinishedIperfController::service(HttpRequest &request, HttpResponse &response)
@@ -31,14 +39,10 @@ void FinishedIperfController::service(HttpRequest &request, HttpResponse &respon
     if(exitCode == 2)
         msg.append("Неправильное использование команды или аргумента");
 
-    emit insert(uuid, from, msg, error);
+    QJsonObject res = db->insertNotification(uuid, from, msg, error);
 
     response.setStatus(200,"Ok");
     response.setHeader("Content-Type", "application/json");
 
-    QJsonObject object{
-        {"RestApi", "Данные получены"}
-    };
-
-    response.write(QJsonDocument(object).toJson(QJsonDocument::Compact), true);
+    response.write(QJsonDocument(res).toJson(QJsonDocument::Compact), true);
 }
