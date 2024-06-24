@@ -5,6 +5,7 @@
 #include <QDebug>
 #include <QMap>
 #include <QJsonObject>
+#include <QJsonDocument>
 #include <QJsonArray>
 #include <QSettings>
 #include <QSqlDatabase>
@@ -13,11 +14,8 @@
 #include <QSqlQuery>
 #include <QSqlTableModel>
 #include <QDateTime>
-#include <QXmlStreamReader>
-#include <QXmlStreamWriter>
 #include <QFile>
-#include <QCoreApplication>
-#include <QDir>
+#include <QTextStream>
 
 class DataBaseConnection : public QObject
 {
@@ -34,7 +32,10 @@ public:
     QJsonObject getNotifications(QSqlQuery query, QString timestamp = "");
 
     /** Добавление записи уведомления в базу данных*/
-    QJsonObject insertNotification(QString processId, QString manager, QString information, QString error);
+    QJsonObject insertNotification(QSqlQuery query, QString processId, QString manager, QString information, QString error);
+
+    /** Добавление записи статистики в базу данных*/
+    QJsonObject insertStatistic(QSqlQuery query, QJsonObject data);
 
     bool update(QString dbName, QString tableName, QJsonObject values, QString filter);
 

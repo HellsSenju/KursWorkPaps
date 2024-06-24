@@ -1,8 +1,8 @@
-#include "notificationscontroller.h"
+#include "statisticfromiperfcontroller.h"
 
-NotificationsController::NotificationsController()
+StatisticFromIperfController::StatisticFromIperfController()
 {
-    database = QSqlDatabase::addDatabase("QPSQL", "n");
+    database = QSqlDatabase::addDatabase("QPSQL", "s");
     database.setHostName(db->getHostName());
     database.setDatabaseName(db->getDbName());
     database.setUserName(db->getUser());
@@ -14,19 +14,17 @@ NotificationsController::NotificationsController()
         qDebug("NotificationsController : нет соединения. Ошибка %s", qPrintable(database.lastError().text()));
 }
 
-void NotificationsController::service(HttpRequest &request, HttpResponse &response)
+void StatisticFromIperfController::service(HttpRequest &request, HttpResponse &response)
 {
-    qDebug() << request.getBody();
+    qDebug().noquote() << request.getBody();
     QJsonObject req = network->parseRequest(request.getBody());
 
-    QSqlQuery query = QSqlQuery(database.database("n"));
+    QSqlQuery query = QSqlQuery(database.database("f"));
 
-    QJsonObject res = db->getNotifications(query, req.value("timestamp").toString());
+    QJsonObject res = db->insertStatistic(query, req);
 
     response.setStatus(200,"Ok");
     response.setHeader("Content-Type", "application/json");
 
     response.write(QJsonDocument(res).toJson(QJsonDocument::Compact), true);
-
-    database.removeDatabase("n");
 }

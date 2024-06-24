@@ -42,6 +42,33 @@ IperfClient::IperfClient(QUuid processUuid)
             setState(ProcessState::Crashed);
         }
 
+        QStringList output = QString(process->readAllStandardOutput()).split("\n");
+
+        for(int i = 0; i < output.size(); i++){
+            QString temp = output.at(i);
+            if(temp.contains("Server Report")){
+                QStringList results = output.at(i + 2).split(' ', Qt::SkipEmptyParts);
+                if(results.size() != 12)
+                    break;
+
+                QStringList lostTotal = results.at(10).split('/');
+                qDebug() << "lostTotal" << lostTotal;
+                QString temp = results.at(11);
+                QJsonObject body{
+                    {"uuid", getUuid()},
+                    {"interval", results.at(2) + " " + results.at(3)},
+                    {"transfer", results.at(4) + " " + results.at(5)},
+                    {"bandwidth", results.at(6) + " " + results.at(7)},
+                    {"jitter", results.at(8) + " " + results.at(9)},
+                    {"lost", lostTotal.at(0).toInt()},
+                    {"total", lostTotal.at(1).toInt()},
+                    {"lost/total", temp.remove('(').remove(')')},
+                };
+
+                network->post("/iperf/postStats", body);
+            }
+        }
+
         if(!stoped){
             QJsonObject body{
                 {"uuid", getUuid()},

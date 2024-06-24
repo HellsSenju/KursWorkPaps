@@ -39,7 +39,8 @@ void FinishedIperfController::service(HttpRequest &request, HttpResponse &respon
     if(exitCode == 2)
         msg.append("Неправильное использование команды или аргумента");
 
-    QJsonObject res = db->insertNotification(uuid, from, msg, error);
+    QSqlQuery query = QSqlQuery(database.database("f"));
+    QJsonObject res = db->insertNotification(query, uuid, from, msg, error);
 
     response.setStatus(200,"Ok");
     response.setHeader("Content-Type", "application/json");

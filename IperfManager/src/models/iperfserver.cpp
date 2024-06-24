@@ -57,3 +57,8 @@ IperfServer::IperfServer(QUuid processUuid)
         }
     });
 }
+
+void IperfServer::onStandartOutput()
+{
+
+}

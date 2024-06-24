@@ -71,11 +71,7 @@ protected:
 
 protected slots:
     virtual void onStandartOutput(){
-//        QJsonObject body{
-//            {"efrewf", "fessef"}
-//        };
-//        network->post("/iperf/start", body);
-        qDebug() << "Iperf : standartOutput: " <<  process->readAll();
+//        qDebug() << "Iperf : standartOutput: " <<  process->readAll();
     };
 
     virtual void onStandartError(){

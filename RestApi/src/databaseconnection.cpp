@@ -76,16 +76,20 @@ QJsonObject DataBaseConnection::getNotifications(QSqlQuery query, QString timest
         obj.insert(buff.value("process_id").toString(), buff);
     }
 
+    if(obj.size() == 0)
+        obj.insert("msg", "Новых уведомлений нет.");
+
+    setNewLastTime(QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss"));
     return obj;
 }
 
 
-QJsonObject DataBaseConnection::insertNotification(QString processId,
-                                             QString manager,
-                                             QString information,
-                                             QString error)
+QJsonObject DataBaseConnection::insertNotification(QSqlQuery query,
+                                                   QString processId,
+                                                   QString manager,
+                                                   QString information,
+                                                   QString error)
 {
-    QSqlQuery query = QSqlQuery(db.database(dbName));
     QString SQL;
     QJsonObject obj;
 
@@ -121,7 +125,43 @@ QJsonObject DataBaseConnection::insertNotification(QString processId,
         return obj;
     }
 
-    obj["RestApi"] = "Success";
+    obj["RestApi"] = "Данные успешно добавлены в уведомления.";
+    return obj;
+}
+
+QJsonObject DataBaseConnection::insertStatistic(QSqlQuery query, QJsonObject data)
+{
+
+    QString SQL = QString("INSERT INTO iperf_statistic(process_id, interval_, transfer, brandwidth, "
+                          "jitter, lost, total, lost_total, creation_time) "
+                          "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+    QJsonObject obj;
+
+    if(!query.prepare(SQL)) {
+        qDebug() << "with error";
+        qDebug("DataBaseConnection : Prepare fasle. %s", qPrintable(query.lastError().text()));
+        obj["error"] = query.lastError().text();
+        return obj;
+    }
+
+    query.addBindValue(data.value("uuid").toString());
+    query.addBindValue(data.value("interval").toString());
+    query.addBindValue(data.value("transfer").toString());
+    query.addBindValue(data.value("bandwidth").toString());
+    query.addBindValue(data.value("jitter").toString());
+    query.addBindValue(data.value("lost").toInt());
+    query.addBindValue(data.value("total").toInt());
+    query.addBindValue(data.value("lost/total").toString());
+    query.addBindValue(QDateTime::currentDateTime());
+
+    if(!query.exec()){
+        qDebug("Запрос: %s", qPrintable(query.lastQuery()));
+        qDebug("Запрос не выполнился. Ошибка: %s", qPrintable(query.lastError().text()));
+        obj["error"] = query.lastError().text();
+        return obj;
+    }
+
+    obj["RestApi"] = "Данные успешно добавлены в статистику.";
     return obj;
 }
 
@@ -153,26 +193,28 @@ QString DataBaseConnection::getLastTime()
         return "error in file opening";
     }
     else{
-        QXmlStreamReader xmlReader;
-        xmlReader.setDevice(&file);
-        xmlReader.readNext();   // Переходит к первому элементу в файле
-        while(!xmlReader.atEnd()){
-            if(xmlReader.isStartElement()){
-                if(xmlReader.name() == "lastNotif"){
-                    return xmlReader.readElementText();
-                }
-            }
-            xmlReader.readNext();
-        }
-    }
+        QString temp = file.readAll();
+        file.close();
 
-    file.close();
-    return "error/ no such token - lastNotif";
+        QJsonObject json = QJsonDocument::fromJson(temp.toUtf8()).object();
+
+        return json.contains("lastNotif") ? json.value("lastNotif").toString() : "error/ no such field - lastNotif" ;
+    }
 }
 
 void DataBaseConnection::setNewLastTime(QString newTime)
 {
+    QFile file(helperFile);
+    file.open(QIODevice::WriteOnly | QFile::ReadOnly | QFile::Text);
+    QString temp = file.readAll();
 
+    QJsonObject json = QJsonDocument::fromJson(temp.toUtf8()).object();
+    json["lastNotif"] = newTime;
+    file.resize(0);
+
+    QTextStream stream( &file );
+    stream << QJsonDocument(json).toJson(QJsonDocument::Compact);
+    file.close();
 }
 
 bool DataBaseConnection::update(QString dbName, QString tableName, QJsonObject values, QString filter)

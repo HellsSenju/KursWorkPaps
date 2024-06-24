@@ -21,22 +21,21 @@ void StartController::service(HttpRequest &request, HttpResponse &response)
 
     QString uuid = req.value("uuid").toString();
 
-    QTimer timer;
-    timer.setSingleShot(true);
-    QEventLoop loop;
-
-    connect( manager, &IperfManager::iperfChanged, &loop, &QEventLoop::quit);
-    connect( &timer, &QTimer::timeout, &loop, &QEventLoop::quit );
-
     if(manager->checkDublicates(uuid)){
         QJsonObject object{
             {"IperfManager", "Процесс с таким идентификатором уже существует."}
         };
 
         response.write(QJsonDocument(object).toJson(QJsonDocument::Compact),true);
-        return;
     }
     else{
+        QTimer timer;
+        timer.setSingleShot(true);
+        QEventLoop loop;
+
+        connect( manager, &IperfManager::iperfChanged, &loop, &QEventLoop::quit);
+        connect( &timer, &QTimer::timeout, &loop, &QEventLoop::quit );
+
         manager->startNewProcess(isServer, uuid, req.value("command").toString());
 
         timer.start(10000); //10 sec
@@ -101,8 +100,8 @@ void StartController::service(HttpRequest &request, HttpResponse &response)
             response.write(QJsonDocument(object).toJson(QJsonDocument::Compact), true);
             break;
         }
-    }
 
-    disconnect( manager, &IperfManager::iperfChanged, &loop, &QEventLoop::quit);
-    disconnect( &timer, &QTimer::timeout, &loop, &QEventLoop::quit );
+        disconnect( manager, &IperfManager::iperfChanged, &loop, &QEventLoop::quit);
+        disconnect( &timer, &QTimer::timeout, &loop, &QEventLoop::quit );
+    }
 }

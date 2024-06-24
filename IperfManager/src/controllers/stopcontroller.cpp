@@ -15,13 +15,6 @@ void StopController::service(HttpRequest &request, HttpResponse &response)
     response.setStatus(200, "Ok");
     response.setHeader("Content-Type", "application/json");
 
-    QTimer timer;
-    timer.setSingleShot(true);
-    QEventLoop loop;
-
-    connect( manager, &IperfManager::iperfChanged, &loop, &QEventLoop::quit);
-    connect( &timer, &QTimer::timeout, &loop, &QEventLoop::quit );
-
     if(!manager->checkDublicates(uuid)){
         QJsonObject object{
             {"IperfManager", "Процесса с таким идентификатором не существует."}
@@ -31,6 +24,13 @@ void StopController::service(HttpRequest &request, HttpResponse &response)
         return;
     }
     else{
+        QTimer timer;
+        timer.setSingleShot(true);
+        QEventLoop loop;
+
+        connect( manager, &IperfManager::iperfChanged, &loop, &QEventLoop::quit);
+        connect( &timer, &QTimer::timeout, &loop, &QEventLoop::quit );
+
         manager->stopProcess(uuid);
 
         timer.start(10000); //10 sec
@@ -64,9 +64,9 @@ void StopController::service(HttpRequest &request, HttpResponse &response)
             response.write(QJsonDocument(object).toJson(QJsonDocument::Compact), true);
             break;
         }
-    }
 
-    manager->deleteProcess(uuid);
-    disconnect( manager, &IperfManager::iperfChanged, &loop, &QEventLoop::quit);
-    disconnect( &timer, &QTimer::timeout, &loop, &QEventLoop::quit );
+        manager->deleteProcess(uuid);
+        disconnect( manager, &IperfManager::iperfChanged, &loop, &QEventLoop::quit);
+        disconnect( &timer, &QTimer::timeout, &loop, &QEventLoop::quit );
+    }
 }

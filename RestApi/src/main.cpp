@@ -48,7 +48,7 @@ QString searchHelperFile()
 {
     QString binDir=QCoreApplication::applicationDirPath();
     QString appName=QCoreApplication::applicationName();
-    QString fileName("helpers.xml");
+    QString fileName("helpers.json");
 
     QStringList searchList;
     searchList.append(binDir);
