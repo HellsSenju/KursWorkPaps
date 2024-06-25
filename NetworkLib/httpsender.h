@@ -17,6 +17,7 @@ public:
     explicit HttpSender(QByteArray toSend,
                         const QString &ip,
                         int port,
+                        QString uuid = "",
                         QObject *parent = nullptr);
 
     const QJsonObject &getResponse() const{
@@ -35,15 +36,13 @@ private:
 
     QJsonObject response;
 
-
-
 public slots:
     void run();
 
 signals:
     void finished();
     void written(bool res);
-    void hadResult(QString res);
+    void hadResult(QJsonObject res, QString uuid);
 
 };
 

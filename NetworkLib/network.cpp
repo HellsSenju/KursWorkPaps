@@ -11,6 +11,15 @@ Network::Network(const QSettings* settings, QObject *parent)
     port = settings->value("port").toInt();
 }
 
+Network::~Network()
+{
+    QMapIterator<QThread*, HttpSender*> i(pool);
+    while (i.hasNext()) {
+        i.next();
+        deleteThread(i.key());
+    }
+}
+
 QThread *Network::post(QString url, QString ip, int port, QJsonObject body)
 {
     QThread* thread = new QThread();
@@ -21,15 +30,43 @@ QThread *Network::post(QString url, QString ip, int port, QJsonObject body)
                                         ip,
                                         port);
 
-    connect(sender, &HttpSender::finished, thread, &QThread::terminate);
+    connect(sender, &HttpSender::finished, thread, &QThread::quit);
     connect(sender, &HttpSender::hadResult, this, &Network::onResult,
             Qt::ConnectionType::QueuedConnection);
     connect(thread, &QThread::started, sender, &HttpSender::run);
 
     pool.insert(thread, sender);
 
+    sender->moveToThread(thread);
     thread->start();
     return thread;
+}
+
+QString Network::post__(QString url, QString ip, int port, QJsonObject body)
+{
+    QString uuid = QUuid::createUuid().toString(QUuid::WithoutBraces);
+    QThread* thread = new QThread();
+    HttpSender *sender = new HttpSender(configureRequest(url,
+                                                         ip,
+                                                         port,
+                                                         QJsonDocument(body).toJson(QJsonDocument::Compact)),
+                                        ip,
+                                        port,
+                                        uuid);
+
+    connect(thread, &QThread::started, sender, &HttpSender::run);
+    connect(thread, &QThread::finished, this, &Network::onThreadFinished);
+
+    connect(sender, &HttpSender::finished, thread, &QThread::terminate);
+    connect(sender, &HttpSender::hadResult, this, &Network::onResult,
+            Qt::ConnectionType::QueuedConnection);
+
+
+    pool.insert(thread, sender);
+
+    sender->moveToThread(thread);
+    thread->start();
+    return uuid;
 }
 
 void Network::post(const QString &url, QJsonObject body)
@@ -53,12 +90,34 @@ void Network::post(const QString &url, QJsonObject body)
     thread->start();
 }
 
+void Network::post_(const QString &url, QJsonObject body)
+{
+    QThread *thread = new QThread();
+    HttpSender *sender = new HttpSender(configureRequest(url,
+                                                         ip,
+                                                         port,
+                                                         QJsonDocument(body).toJson(QJsonDocument::Compact)),
+                                        ip,
+                                        port);
+
+    connect(thread, &QThread::started, sender, &HttpSender::run);
+    connect(sender, &HttpSender::finished, thread, &QThread::terminate);
+    connect(sender, &HttpSender::hadResult, this, &Network::onResult,
+            Qt::ConnectionType::QueuedConnection);
+    connect(thread, &QThread::finished, this, &Network::onThreadFinished);
+
+    pool.insert(thread, sender);
+
+    sender->moveToThread(thread);
+    thread->start();
+}
+
 void Network::deleteThread(QThread *thread)
 {
     HttpSender* sender = pool.value(thread);
 
     disconnect(thread, &QThread::started, sender, &HttpSender::run);
-    disconnect(sender, &HttpSender::finished, thread, &QThread::terminate);
+    disconnect(sender, &HttpSender::finished, thread, &QThread::quit);
     disconnect(sender, &HttpSender::hadResult, this, &Network::onResult);
 
     sender->deleteLater();
@@ -66,9 +125,11 @@ void Network::deleteThread(QThread *thread)
     thread->deleteLater();
 }
 
-void Network::onResult(QString res)
+void Network::onResult(QJsonObject res, QString uuid)
 {
     qDebug() << "onResult : " << res;
+    if(!uuid.isEmpty())
+        results.insert(uuid, res);
 }
 
 void Network::onThreadFinished()

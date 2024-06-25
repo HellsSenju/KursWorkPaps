@@ -1,6 +1,6 @@
 #include "httpsender.h"
 
-HttpSender::HttpSender(QByteArray toSend, const QString& ip, int port, QObject *parent)
+HttpSender::HttpSender(QByteArray toSend, const QString& ip, int port, QString uuid, QObject *parent)
     : QObject{parent}
 {
     Q_ASSERT(ip != nullptr);
@@ -8,23 +8,24 @@ HttpSender::HttpSender(QByteArray toSend, const QString& ip, int port, QObject *
     this->toSend = toSend;
     this->ip = ip;
     this->port = port;
+    this->uuid = uuid;
 }
 
 
 void HttpSender::run()
 {
-    QTcpSocket *socket = new  QTcpSocket();
+    QTcpSocket socket;
 
-    socket->connectToHost(ip, port);
+    socket.connectToHost(ip, port);
 
-    if(!socket->waitForConnected()){
+    if(!socket.waitForConnected()){
         qDebug("HttpSender : not connected");
         return;
     }
 
 //      qDebug("HttpSender : connected");
 
-    qint64 res = socket->write(toSend);
+    qint64 res = socket.write(toSend);
     if(res == -1){
         qDebug("HttpSender : ничего не было отправлено");
     }
@@ -32,16 +33,17 @@ void HttpSender::run()
         qDebug("HttpSender : %lli байт отправлено", res);
     }
 
-    socket->waitForBytesWritten();
-    socket->waitForReadyRead();
+    socket.waitForBytesWritten();
+    socket.waitForReadyRead();
 
-    QString resStr = QString(socket->readAll());
-    response["resStatus"] = resStr.split("\r\n").first().split(' ').at(1);
-    response["resBody"] = resStr.split("\r\n").last();
+    QString resStr = QString(socket.readAll());
+    if(!resStr.isEmpty()){
+        response["resStatus"] = resStr.split("\r\n").first().split(' ').at(1);
+        response["resBody"] = resStr.split("\r\n").last();
+    }
 
-    socket->close();
-    socket->deleteLater();
+    socket.close();
 
+    emit hadResult(response, uuid);
     emit finished();
-//    emit hadResult(resBody);
 }

@@ -12,6 +12,7 @@
 #include "models/abstractiperf.h"
 #include "globalnetwork.h"
 
+
 QString searchConfigFile()
 {
     QString binDir=QCoreApplication::applicationDirPath();

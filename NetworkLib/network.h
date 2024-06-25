@@ -21,6 +21,7 @@ class Network : public QObject
     Q_OBJECT
 public:
     explicit Network(const QSettings* settings, QObject *parent = nullptr);
+    ~Network();
 
     struct Response{
         QString resStatus;
@@ -49,8 +50,10 @@ public:
     QJsonObject parseRequest(const QString& in);
 
 
+    void post_(const QString &url, QJsonObject body);
+    QString post__(QString url, QString ip, int port, QJsonObject body);
 public slots:
-    void onResult(QString res);
+    void onResult(QJsonObject res, QString uuid);
     void onThreadFinished();
 
 signals:
@@ -62,6 +65,7 @@ private:
     int port;
 
     QMap<QThread*, HttpSender*> pool;
+    QMap<QString, QJsonObject> results;
 
 };
 
