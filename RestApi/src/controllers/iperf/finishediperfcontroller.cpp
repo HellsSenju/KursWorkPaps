@@ -1,5 +1,7 @@
 #include "finishediperfcontroller.h"
 
+#include <QUuid>
+
 FinishedIperfController::FinishedIperfController()
 {
 }
@@ -9,7 +11,8 @@ void FinishedIperfController::service(HttpRequest &request, HttpResponse &respon
     qDebug().noquote() << "FinishedIperfController : " << request.getBody();
     QJsonObject req = network->parseRequest(request.getBody());
 
-    database = QSqlDatabase::addDatabase("QPSQL", "f");
+    QString connection = QUuid::createUuid().toString();
+    database = QSqlDatabase::addDatabase("QPSQL", connection);
     database.setHostName(db->getHostName());
     database.setDatabaseName(db->getDbName());
     database.setUserName(db->getUser());
@@ -17,36 +20,14 @@ void FinishedIperfController::service(HttpRequest &request, HttpResponse &respon
 
     if(database.open()){
         qDebug("FinishedIperfController : соединение открыто");
-        QString uuid = req.value("uuid").toString();
-        QString from = req.value("from").toString();
-        int exitStatus = req.value("exitStatus").toInt();
-        int exitCode = req.value("exitCode").toInt();
-        QString error = req.contains("error") ? req.value("error").toString() : "";
 
-        QString msg = "";
-
-        if(exitStatus == 0)
-            msg.append("Процесс завершился (Normal exit). ");
-        else
-            msg.append(QString("Процесс завершился с ошибкой = %s (Crashed exit). ").arg(exitCode));
-
-        if(exitCode == 0)
-            msg.append("Выполнено без ошибок");
-        if(exitCode == 1)
-            msg.append("Общая ощибка.");
-        if(exitCode == 2)
-            msg.append("Неправильное использование команды или аргумента");
-
-
-
-        QSqlQuery query = QSqlQuery(database.database("f"));
-        QJsonObject res = db->insertNotification(query, uuid, from, msg, error);
+        QSqlQuery query = QSqlQuery(database.database(connection));
+        QJsonObject res = db->insertNotification(query, req);
 
         response.setStatus(200,"Ok");
         response.setHeader("Content-Type", "application/json");
 
         response.write(QJsonDocument(res).toJson(QJsonDocument::Compact), true);
-        database.removeDatabase("f");
     }
     else{
         qDebug("FinishedIperfController : нет соединения. Ошибка %s", qPrintable(database.lastError().text()));
@@ -60,8 +41,8 @@ void FinishedIperfController::service(HttpRequest &request, HttpResponse &respon
 
         response.write(QJsonDocument(res).toJson(QJsonDocument::Compact), true);
 
-        database.removeDatabase("f");
+
     }
 
-
+    database.removeDatabase(connection);
 }

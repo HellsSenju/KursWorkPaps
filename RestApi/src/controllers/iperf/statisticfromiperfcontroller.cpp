@@ -1,4 +1,5 @@
 #include "statisticfromiperfcontroller.h"
+#include <QUuid>
 
 StatisticFromIperfController::StatisticFromIperfController()
 {
@@ -6,10 +7,11 @@ StatisticFromIperfController::StatisticFromIperfController()
 
 void StatisticFromIperfController::service(HttpRequest &request, HttpResponse &response)
 {
-    qDebug().noquote() << request.getBody();
+    qDebug().noquote() << "StatisticFromIperfController : " << request.getBody();
     QJsonObject req = network->parseRequest(request.getBody());
 
-    database = QSqlDatabase::addDatabase("QPSQL", "s");
+    QString connection = QUuid::createUuid().toString();
+    database = QSqlDatabase::addDatabase("QPSQL", connection);
     database.setHostName(db->getHostName());
     database.setDatabaseName(db->getDbName());
     database.setUserName(db->getUser());
@@ -18,7 +20,7 @@ void StatisticFromIperfController::service(HttpRequest &request, HttpResponse &r
     if(database.open()){
         qDebug("StatisticFromIperfController : соединение открыто");
 
-        QSqlQuery query = QSqlQuery(database.database("s"));
+        QSqlQuery query = QSqlQuery(database.database(connection));
 
         QJsonObject res = db->insertStatistic(query, req);
 
@@ -26,7 +28,6 @@ void StatisticFromIperfController::service(HttpRequest &request, HttpResponse &r
         response.setHeader("Content-Type", "application/json");
 
         response.write(QJsonDocument(res).toJson(QJsonDocument::Compact), true);
-        database.removeDatabase("s");
     }
     else{
         qDebug("StatisticFromIperfController : нет соединения. Ошибка %s", qPrintable(database.lastError().text()));
@@ -39,7 +40,7 @@ void StatisticFromIperfController::service(HttpRequest &request, HttpResponse &r
 
 
         response.write(QJsonDocument(res).toJson(QJsonDocument::Compact), true);
-
-        database.removeDatabase("s");
     }
+
+    database.removeDatabase(connection);
 }

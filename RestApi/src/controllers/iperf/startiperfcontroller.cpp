@@ -35,7 +35,7 @@ void StartIperfController::service(HttpRequest &request, HttpResponse &response)
         QThread* thread = network->post("/start", ip, port, req);
         connect( thread, &QThread::finished, &loop, &QEventLoop::quit);
 
-        timer.start(10000); //10 sec
+        timer.start(20000); //10 sec
         loop.exec();
 
         if(timer.isActive()){

@@ -5,7 +5,6 @@ TCProcess::TCProcess(QUuid processUuid)
     process = new QProcess();
     uuid = processUuid;
 
-    connect(process, &QProcess::readyReadStandardOutput, this, &TCProcess::onStandartOutput);
     connect(process, &QProcess::readyReadStandardError, this, &TCProcess::onStandartError);
     connect(process, &QProcess::errorOccurred, this, &TCProcess::onErrorOccurred);
     connect(process, &QProcess::stateChanged, this, [=](QProcess::ProcessState newState)

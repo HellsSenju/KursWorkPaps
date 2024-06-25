@@ -35,21 +35,29 @@ void DataBaseConnection::connect()
 }
 
 
-QJsonObject DataBaseConnection::getNotifications(QSqlQuery query, QString timestamp)
+QJsonObject DataBaseConnection::getNotifications(QSqlQuery query, QString from, QString to)
 {
     QJsonObject obj;
 
-    if(timestamp.isEmpty())
-        timestamp = getLastTime();
+    if(from.isEmpty())
+        from = getLastTime();
 
-    if(timestamp.contains("error")){
-        obj.insert("error", timestamp);
+    if(from.contains("error")){
+        obj.insert("error", from);
         return obj;
     }
 
-    QString SQL = QString("SELECT process_id, information, error_msg, manager, creation_time "
-                          "FROM notification_2 WHERE notification_2.creation_time > '%1' ")
-            .arg(timestamp);
+    QString SQL;
+
+    if(to.isEmpty())
+        SQL = QString("SELECT process_id, information, error_msg, manager, creation_time, command, output_ "
+                      "FROM notification_2 WHERE notification_2.creation_time > '%1' ")
+        .arg(from);
+    else
+        SQL = QString("SELECT process_id, information, error_msg, manager, creation_time, command, output_ "
+                      "FROM notification_2 WHERE notification_2.creation_time > '%1' "
+                      "AND notification_2.creation_time < '%2'")
+        .arg(from).arg(to);
 
     if(!query.prepare(SQL)) {
         qDebug("DataBaseConnection : Prepare fasle. %s", qPrintable(query.lastError().text()));
@@ -125,22 +133,45 @@ QJsonObject DataBaseConnection::getStatistic(QSqlQuery query, QString from, QStr
 
 
 QJsonObject DataBaseConnection::insertNotification(QSqlQuery query,
-                                                   QString processId,
-                                                   QString manager,
-                                                   QString information,
-                                                   QString error)
+                                                   QJsonObject data)
 {
     QString SQL;
     QJsonObject obj;
 
+    QString from = data.value("from").toString();
+    QString error = data.contains("error") ? data.value("error").toString() : "";
+    QString msg = "";
+    int exitStatus = data.value("exitStatus").toInt();
+    int exitCode = data.value("exitCode").toInt();
+
+    if(exitStatus == 0)
+        msg.append("Процесс завершился (Normal exit). ");
+    else
+        msg.append(QString("Процесс завершился с ошибкой = %s (Crashed exit). ").arg(exitCode));
+
+    if(exitCode == 0)
+        msg.append("Выполнено без ошибок");
+    if(exitCode == 1)
+        msg.append("Общая ощибка.");
+    if(exitCode == 2)
+        msg.append("Неправильное использование команды или аргумента");
+
     // no error
-    if(error.isEmpty()){
+    if(error.isEmpty() && from == "TCManager"){
         qDebug() << "no error";
-        SQL = QString("INSERT INTO %1 (process_id, information, manager, creation_time) VALUES (?, ?, ?, ?)")
+        SQL = QString("INSERT INTO %1 (process_id, information, manager, creation_time, command, output_) VALUES (?, ?, ?, ?, ?, ?)")
                 .arg("notification_2");
     }
-    else{
-        SQL = QString("INSERT INTO %1 (process_id, information, error_msg, manager, creation_time) VALUES (?, ?, ?, ?, ?)")
+    else if(!error.isEmpty() && from == "TCManager"){
+        SQL = QString("INSERT INTO %1 (process_id, information, manager, creation_time, error_msg, command, output_) VALUES (?, ?, ?, ?, ?, ?, ?)")
+                .arg("notification_2");
+    }
+    else if(error.isEmpty() && from == "IperfManager"){
+        SQL = QString("INSERT INTO %1 (process_id, information, manager, creation_time, command) VALUES (?, ?, ?, ?, ?)")
+                .arg("notification_2");
+    }
+    else if(!error.isEmpty() && from == "IperfManager"){
+        SQL = QString("INSERT INTO %1 (process_id, information, manager, creation_time, error_msg, command) VALUES (?, ?, ?, ?, ?, ?)")
                 .arg("notification_2");
     }
 
@@ -151,12 +182,20 @@ QJsonObject DataBaseConnection::insertNotification(QSqlQuery query,
         return obj;
     }
 
-    query.addBindValue(processId);
-    query.addBindValue(information);
+
+
+    query.addBindValue(data.value("uuid").toString());
+    query.addBindValue(msg);
+    query.addBindValue(from);
+    query.addBindValue(QDateTime::currentDateTime());
     if(!error.isEmpty())
         query.addBindValue(error);
-    query.addBindValue(manager);
-    query.addBindValue(QDateTime::currentDateTime());
+
+    query.addBindValue(data.value("command").toString());
+
+    if(from == "TCManager"){
+        query.addBindValue(data.value("output").toString());
+    }
 
     if(!query.exec()){
         qDebug("Запрос: %s", qPrintable(query.lastQuery()));

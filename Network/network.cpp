@@ -83,7 +83,7 @@ void Network::deleteThread(QThread *thread)
     thread->deleteLater();
 }
 
-void Network::onResult(QJsonObject res, QString uuid)
+void Network::onResult(QJsonObject res)
 {
     qDebug() << "onResult : " << res;
 }

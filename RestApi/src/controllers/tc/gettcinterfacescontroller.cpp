@@ -43,9 +43,11 @@ void GetTcInterfacesController::service(HttpRequest &request, HttpResponse &resp
         if(timer.isActive()){
             QJsonObject res = network->getResponse(thread);
 
-            res.insert("host", ip);
             QString resStatus = res["resStatus"].toString();
-            QString resBody = res["resBody"].toString();
+            QJsonObject object =  network->parseRequest(res["resBody"].toString());
+
+            object.insert("host", ip);
+
 
             if(resStatus == "200"){
                 response.setStatus(200,"Ok");
@@ -60,7 +62,7 @@ void GetTcInterfacesController::service(HttpRequest &request, HttpResponse &resp
                 response.setHeader("Content-Type", "application/json");
             }
 
-            response.write(resBody.toUtf8(), true);
+            response.write(QJsonDocument(object).toJson(QJsonDocument::Compact), true);
         }
         else{
             response.setStatus(504, "Gateway Timeout");

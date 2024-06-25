@@ -1,4 +1,6 @@
 #include "statisticcontroller.h"
+#include <QUuid>
+
 
 StatisticController::StatisticController()
 {
@@ -20,7 +22,8 @@ void StatisticController::service(HttpRequest &request, HttpResponse &response)
         response.write(QJsonDocument(object).toJson(QJsonDocument::Compact), true);
     }
     else{
-        database = QSqlDatabase::addDatabase("QPSQL", "st");
+        QString connection = QUuid::createUuid().toString();
+        database = QSqlDatabase::addDatabase("QPSQL", connection);
         database.setHostName(db->getHostName());
         database.setDatabaseName(db->getDbName());
         database.setUserName(db->getUser());
@@ -28,7 +31,7 @@ void StatisticController::service(HttpRequest &request, HttpResponse &response)
 
         if(database.open()){
             qDebug("StatisticController : соединение открыто");
-            QSqlQuery query = QSqlQuery(database.database("st"));
+            QSqlQuery query = QSqlQuery(database.database(connection));
 
             QJsonObject res = db->getStatistic(query,
                                                req.value("from").toString(),
@@ -50,8 +53,8 @@ void StatisticController::service(HttpRequest &request, HttpResponse &response)
 
 
             response.write(QJsonDocument(res).toJson(QJsonDocument::Compact), true);
-
-            database.removeDatabase("st");
         }
+
+        database.removeDatabase(connection);
     }
 }

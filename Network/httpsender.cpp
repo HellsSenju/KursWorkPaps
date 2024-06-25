@@ -23,8 +23,6 @@ void HttpSender::run()
         return;
     }
 
-//      qDebug("HttpSender : connected");
-
     qint64 res = socket.write(toSend);
     if(res == -1){
         qDebug("HttpSender : ничего не было отправлено");
@@ -34,16 +32,17 @@ void HttpSender::run()
     }
 
     socket.waitForBytesWritten();
-    socket.waitForReadyRead();
 
+    socket.waitForReadyRead();
     QString resStr = QString(socket.readAll());
+    socket.waitForReadyRead();
+    resStr.append(socket.readAll());
+
     if(!resStr.isEmpty()){
         response["resStatus"] = resStr.split("\r\n").first().split(' ').at(1);
         response["resBody"] = resStr.split("\r\n").last();
     }
 
-    socket.close();
-
-    emit hadResult(response, uuid);
+    emit hadResult(response);
     emit finished();
 }

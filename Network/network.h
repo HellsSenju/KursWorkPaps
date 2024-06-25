@@ -50,7 +50,7 @@ public:
     QJsonObject parseRequest(const QString& in);
 
 public slots:
-    void onResult(QJsonObject res, QString uuid);
+    void onResult(QJsonObject res);
     void onThreadFinished();
 
 signals:
