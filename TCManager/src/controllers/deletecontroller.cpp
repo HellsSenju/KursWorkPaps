@@ -27,59 +27,50 @@ void DeleteController::service(HttpRequest &request, HttpResponse &response)
         return;
     }
 
-    timer.start(10000); //10 sec
 
     pool->execute(uuid, Programs::TC, body["command"].toString());
 
+    timer.start(10000); //10 sec
     loop.exec();
 
     response.setStatus(200,"Ok");
     response.setHeader("Content-Type", "application/json");
 
+    QJsonObject object;
+
+    QString error = pool->getProcessError(uuid);
+    if(!error.isEmpty())
+        object["error"] = error;
+
+    QString output = pool->getProcessOutput(uuid);
+    if(!output.isEmpty())
+        object["output"] = output;
+
     switch (pool->getProcessState(uuid)) {
     case ProcessState::Finished:
     {
-        QJsonObject object{
-            {"TCManager", "Finished"}
-        };
-        QString error = pool->getProcessError(uuid);
-        if(!error.isEmpty())
-            object["Error"] = error;
-
+        object.insert("TCManager", "Выполнился.");
         response.write(QJsonDocument(object).toJson(QJsonDocument::Compact), true);
      }
         break;
 
     case ProcessState::Crashed:
     {
-        QJsonObject object{
-            {"TCManager", "Процесс завершился сбоем через некоторое время после успешного запуска."}
-        };
-
-        QString error = pool->getProcessError(uuid);
-        if(!error.isEmpty())
-            object["Error"] = error;
-
+        object.insert("TCManager", "Процесс завершился сбоем через некоторое время после успешного запуска.");
         response.write(QJsonDocument(object).toJson(QJsonDocument::Compact), true);
     }
         break;
 
     case ProcessState::FailedToStart:
     {
-        QJsonObject object{
-            {"TCManager", "Не удалось запустить процесс. "
-                "Либо программа отсутствует, либо недостаточно прав для запуска, либо неверная команда."}
-        };
-
+        object.insert("TCManager", "Не удалось запустить процесс. "
+                                   "Либо программа отсутствует, либо недостаточно прав для запуска, либо неверная команда.");
         response.write(QJsonDocument(object).toJson(QJsonDocument::Compact), true);
     }
         break;
 
     default:
-        QJsonObject object{
-            {"TCManager", "Неизвестая ошибка. Попробуйте запустить еще раз"}
-        };
-
+        object.insert("TCManager", "Неизвестая ошибка. Попробуйте запустить еще раз.");
         response.write(QJsonDocument(object).toJson(QJsonDocument::Compact), true);
         break;
     }

@@ -55,7 +55,7 @@ void Network::post(const QString &url, QJsonObject body)
 
     connect(this, &Network::destroyed, thread, &QThread::terminate);
     connect(thread, &QThread::started, sender, &HttpSender::run);
-    connect(sender, &HttpSender::finished, thread, &QThread::terminate);
+    connect(sender, &HttpSender::finished, thread, &QThread::quit);
     connect(sender, &HttpSender::hadResult, this, &Network::onResult,
             Qt::ConnectionType::QueuedConnection);
     connect(thread, &QThread::finished, this, &Network::onThreadFinished);
@@ -83,7 +83,7 @@ void Network::deleteThread(QThread *thread)
     thread->deleteLater();
 }
 
-void Network::onResult(QJsonObject res, QString uuid)
+void Network::onResult(QJsonObject res)
 {
     qDebug() << "onResult : " << res;
 }

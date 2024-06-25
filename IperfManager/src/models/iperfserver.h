@@ -11,9 +11,6 @@ class IperfServer : public AbstractIperf
 public:
     explicit IperfServer(QUuid processUuid);
 
-protected slots:
-    void onStandartOutput() override;
-
 };
 
 #endif // IPERFSERVER_H

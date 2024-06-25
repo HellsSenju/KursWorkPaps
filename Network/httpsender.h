@@ -42,7 +42,7 @@ public slots:
 signals:
     void finished();
     void written(bool res);
-    void hadResult(QJsonObject res, QString uuid);
+    void hadResult(QJsonObject res);
 
 };
 

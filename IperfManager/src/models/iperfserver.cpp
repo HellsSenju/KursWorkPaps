@@ -6,7 +6,6 @@ IperfServer::IperfServer(QUuid processUuid)
     uuid = processUuid;
     server = true;
 
-    connect(process, &QProcess::readyReadStandardOutput, this, &IperfServer::onStandartOutput);
     connect(process, &QProcess::readyReadStandardError, this, &IperfServer::onStandartError);
     connect(process, &QProcess::errorOccurred, this, &IperfServer::onErrorOccurred);
 
@@ -34,12 +33,7 @@ IperfServer::IperfServer(QUuid processUuid)
                exitCode,
                exitStatus
         );
-        if(exitStatus == 0){
-            setState(ProcessState::Finished);
-        }
-        else{
-            setState(ProcessState::Crashed);
-        }
+
 
         if(!stoped){
             QJsonObject body{
@@ -48,6 +42,7 @@ IperfServer::IperfServer(QUuid processUuid)
                 {"exitStatus", exitStatus},
                 {"exitCode", exitCode}
             };
+            body["command"] = process->arguments().join(" ");
 
             if(!error.isEmpty())
                 body["error"] = error;
@@ -55,10 +50,12 @@ IperfServer::IperfServer(QUuid processUuid)
             network->post("/iperf/finished", body);
             emit deleteProcess(getUuid());
         }
+
+        if(exitStatus == 0){
+            setState(ProcessState::Finished);
+        }
+        else{
+            setState(ProcessState::Crashed);
+        }
     });
-}
-
-void IperfServer::onStandartOutput()
-{
-
 }
