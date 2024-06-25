@@ -15,3 +15,42 @@ fq_codel - FQ_Codel (Fair Queuing with Controlled Delay) - это дисципл
    7/ ecn | noecn имеет ту же семантику, что и codel, и может использоваться для пометки пакетов вместо их отбрасывания. Если ecn был включен, noecn может быть использован для его отключения и наоборот. В отличие от codel, ecn включен по умолчанию.
 
    8/ ce_threshold устанавливает порог, при превышении которого все пакеты помечаются как ECN Congestion Experienced. Это полезно для алгоритмов управления перегрузками в стиле DCTCP, которые требуют маркировки при очень низких порогах очереди.
+   
+   
+   CREATE TABLE IF NOT EXISTS public.notification_2
+(
+    id integer NOT NULL GENERATED ALWAYS AS IDENTITY ( INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1 ),
+    process_id uuid NOT NULL,
+    information character varying(500) COLLATE pg_catalog."default" NOT NULL,
+    error_msg character varying(500) COLLATE pg_catalog."default",
+    manager character varying(100) COLLATE pg_catalog."default",
+    creation_time timestamp without time zone,
+    CONSTRAINT "Notification_2_pkey" PRIMARY KEY (id)
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS public.notification_2
+    OWNER to postgres;
+    
+    
+    
+    CREATE TABLE IF NOT EXISTS public.iperf_statistic
+(
+    id integer NOT NULL GENERATED ALWAYS AS IDENTITY ( INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1 ),
+    process_id uuid NOT NULL,
+    interval_ character varying(100) COLLATE pg_catalog."default" NOT NULL,
+    transfer character varying(100) COLLATE pg_catalog."default" NOT NULL,
+    brandwidth character varying(100) COLLATE pg_catalog."default" NOT NULL,
+    jitter character varying(100) COLLATE pg_catalog."default" NOT NULL,
+    lost integer NOT NULL,
+    total integer NOT NULL,
+    lost_total character varying(100) COLLATE pg_catalog."default" NOT NULL,
+    creation_time timestamp without time zone NOT NULL,
+    CONSTRAINT iperf_statistic_pkey PRIMARY KEY (id)
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS public.iperf_statistic
+    OWNER to postgres;
