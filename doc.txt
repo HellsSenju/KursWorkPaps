@@ -17,7 +17,7 @@ fq_codel - FQ_Codel (Fair Queuing with Controlled Delay) - это дисципл
    8/ ce_threshold устанавливает порог, при превышении которого все пакеты помечаются как ECN Congestion Experienced. Это полезно для алгоритмов управления перегрузками в стиле DCTCP, которые требуют маркировки при очень низких порогах очереди.
    
    
-   CREATE TABLE IF NOT EXISTS public.notification_2
+CREATE TABLE IF NOT EXISTS public.notification_2
 (
     id integer NOT NULL GENERATED ALWAYS AS IDENTITY ( INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1 ),
     process_id uuid NOT NULL,
@@ -25,6 +25,8 @@ fq_codel - FQ_Codel (Fair Queuing with Controlled Delay) - это дисципл
     error_msg character varying(500) COLLATE pg_catalog."default",
     manager character varying(100) COLLATE pg_catalog."default",
     creation_time timestamp without time zone,
+    command character varying(500) COLLATE pg_catalog."default",
+    output_ character varying(500) COLLATE pg_catalog."default",
     CONSTRAINT "Notification_2_pkey" PRIMARY KEY (id)
 )
 
@@ -32,7 +34,6 @@ TABLESPACE pg_default;
 
 ALTER TABLE IF EXISTS public.notification_2
     OWNER to postgres;
-    
     
     
     CREATE TABLE IF NOT EXISTS public.iperf_statistic
