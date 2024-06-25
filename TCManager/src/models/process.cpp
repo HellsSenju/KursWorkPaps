@@ -33,21 +33,19 @@ Process::Process(QUuid processUuid)
                exitCode,
                exitStatus
         );
+
+        QString res = process->readAllStandardOutput();
+        QStringList list = res.split("\n");
+
+        for(int i = 1; i < list.size(); i++){
+            QString el = list.at(i).split(' ').first();
+            if(!el.isEmpty())
+                interfaces.append(el);
+        }
+
+        qDebug() << "interfaces : " << interfaces;
         setState(ProcessState::Finished);
     });
 }
 
-void Process::onStandartOutput()
-{
-    QString str = process->readAll();
-    QStringList list = str.split("\n");
-
-    for(int i = 1; i < list.size(); i++){
-        QString el = list.at(i).split(' ').first();
-        if(!el.isEmpty())
-            interfaces.append(el);
-    }
-
-//    qDebug() << "standartOutput: " << interfaces;
-}
 

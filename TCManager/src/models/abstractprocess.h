@@ -80,8 +80,7 @@ protected slots:
 
     virtual void onStandartError(){
         QString temp = process->readAllStandardError();
-        if(temp.contains("Error"))
-            error = temp;
+        error.append(temp);
         qDebug("standartError (%s): %s", qPrintable(getUuid()), qPrintable(temp));
     };
 

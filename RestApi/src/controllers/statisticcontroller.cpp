@@ -26,20 +26,32 @@ void StatisticController::service(HttpRequest &request, HttpResponse &response)
         database.setUserName(db->getUser());
         database.setPassword(db->getPassword());
 
-        if(database.open())
-            qDebug("NotificationsController : соединение открыто");
-        else
-            qDebug("NotificationsController : нет соединения. Ошибка %s", qPrintable(database.lastError().text()));
+        if(database.open()){
+            qDebug("StatisticController : соединение открыто");
+            QSqlQuery query = QSqlQuery(database.database("st"));
 
-        QSqlQuery query = QSqlQuery(database.database("st"));
+            QJsonObject res = db->getStatistic(query,
+                                               req.value("from").toString(),
+                                               req.value("to").toString());
 
-        QJsonObject res = db->getStatistic(query,
-                                           req.value("from").toString(),
-                                           req.value("to").toString());
+            response.setStatus(200,"Ok");
+            response.setHeader("Content-Type", "application/json");
 
-        response.setStatus(200,"Ok");
-        response.setHeader("Content-Type", "application/json");
+            response.write(QJsonDocument(res).toJson(QJsonDocument::Compact), true);
+        }
+        else{
+            qDebug("StatisticController : нет соединения. Ошибка %s", qPrintable(database.lastError().text()));
+            response.setStatus(200,"Ok");
+            response.setHeader("Content-Type", "application/json");
 
-        response.write(QJsonDocument(res).toJson(QJsonDocument::Compact), true);
+            QJsonObject res{
+                {"RestApi", "Не удалось подключиться к бд."}
+            };
+
+
+            response.write(QJsonDocument(res).toJson(QJsonDocument::Compact), true);
+
+            database.removeDatabase("st");
+        }
     }
 }

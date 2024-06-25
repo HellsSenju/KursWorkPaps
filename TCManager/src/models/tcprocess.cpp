@@ -41,20 +41,17 @@ TCProcess::TCProcess(QUuid processUuid)
             setState(ProcessState::Crashed);
         }
 
-        if(!stoped){
+        QJsonObject body;
+        body["uuid"] = getUuid();
+        body["from"] = "TCManager";
+        body["exitStatus"] = exitStatus;
+        body["exitCode"] = exitCode;
 
-            QJsonObject body;
-            body["uuid"] = getUuid();
-            body["from"] = "TCManager";
-            body["exitStatus"] = exitStatus;
-            body["exitCode"] = exitCode;
+        if(!error.isEmpty())
+            body["error"] = error;
 
-            error = process->readAllStandardError();
-            if(!error.isEmpty())
-                body["error"] = error;
+        network->post("/iperf/finished", body);
+        emit deleteProcess(getUuid());
 
-            network->post("/iperf/finished", body);
-            emit deleteProcess(getUuid());
-        }
     });
 }

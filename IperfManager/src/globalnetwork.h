@@ -1,8 +1,7 @@
 #ifndef GLOBALNETWORK_H
 #define GLOBALNETWORK_H
 
-#include "networklib.h"
-#include "NetworkLib_global.h"
+#include "network.h"
 
 
 extern Network* network;

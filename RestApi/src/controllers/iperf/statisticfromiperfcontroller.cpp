@@ -2,16 +2,6 @@
 
 StatisticFromIperfController::StatisticFromIperfController()
 {
-    database = QSqlDatabase::addDatabase("QPSQL", "s");
-    database.setHostName(db->getHostName());
-    database.setDatabaseName(db->getDbName());
-    database.setUserName(db->getUser());
-    database.setPassword(db->getPassword());
-
-    if(database.open())
-        qDebug("NotificationsController : соединение открыто");
-    else
-        qDebug("NotificationsController : нет соединения. Ошибка %s", qPrintable(database.lastError().text()));
 }
 
 void StatisticFromIperfController::service(HttpRequest &request, HttpResponse &response)
@@ -19,12 +9,37 @@ void StatisticFromIperfController::service(HttpRequest &request, HttpResponse &r
     qDebug().noquote() << request.getBody();
     QJsonObject req = network->parseRequest(request.getBody());
 
-    QSqlQuery query = QSqlQuery(database.database("f"));
+    database = QSqlDatabase::addDatabase("QPSQL", "s");
+    database.setHostName(db->getHostName());
+    database.setDatabaseName(db->getDbName());
+    database.setUserName(db->getUser());
+    database.setPassword(db->getPassword());
 
-    QJsonObject res = db->insertStatistic(query, req);
+    if(database.open()){
+        qDebug("StatisticFromIperfController : соединение открыто");
 
-    response.setStatus(200,"Ok");
-    response.setHeader("Content-Type", "application/json");
+        QSqlQuery query = QSqlQuery(database.database("s"));
 
-    response.write(QJsonDocument(res).toJson(QJsonDocument::Compact), true);
+        QJsonObject res = db->insertStatistic(query, req);
+
+        response.setStatus(200,"Ok");
+        response.setHeader("Content-Type", "application/json");
+
+        response.write(QJsonDocument(res).toJson(QJsonDocument::Compact), true);
+        database.removeDatabase("s");
+    }
+    else{
+        qDebug("StatisticFromIperfController : нет соединения. Ошибка %s", qPrintable(database.lastError().text()));
+        response.setStatus(200,"Ok");
+        response.setHeader("Content-Type", "application/json");
+
+        QJsonObject res{
+            {"RestApi", "Не удалось подключиться к бд."}
+        };
+
+
+        response.write(QJsonDocument(res).toJson(QJsonDocument::Compact), true);
+
+        database.removeDatabase("s");
+    }
 }

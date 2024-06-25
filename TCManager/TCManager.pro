@@ -44,7 +44,7 @@ HEADERS += \
     src/myapplication.h \
     src/processespool.h
 
-include(../QtWebApp/httpserver/httpserver.pri)
+include(../QtWebApp/httpserver/httpserver.pri)nET
 include(../QtWebApp/logging/logging.pri)
 
 # Not used: include(QtWebApp/templateengine/templateengine.pri)
@@ -52,9 +52,16 @@ include(../QtWebApp/logging/logging.pri)
 DISTFILES += \
     logs/uuids
 
-win32:CONFIG(release, debug|release): LIBS += -L$$PWD/'../build/ NetworkLibDebug/release/' -lNetworkLib
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/'../build/ NetworkLibDebug/debug/' -lNetworkLib
-else:unix: LIBS += -L$$PWD/'../build/ NetworkLibDebug/' -lNetworkLib
 
-INCLUDEPATH += $$PWD/../NetworkLib
-DEPENDPATH += $$PWD/../NetworkLib
+win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../build/NetworkDebug/release/ -lNetwork
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../build/NetworkDebug/debug/ -lNetwork
+else:unix: LIBS += -L$$PWD/../build/NetworkDebug/ -lNetwork
+
+INCLUDEPATH += $$PWD/../Network
+DEPENDPATH += $$PWD/../Network
+
+win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/../build/NetworkDebug/release/libNetwork.a
+else:win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$PWD/../build/NetworkDebug/debug/libNetwork.a
+else:win32:!win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/../build/NetworkDebug/release/Network.lib
+else:win32:!win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$PWD/../build/NetworkDebug/debug/Network.lib
+else:unix: PRE_TARGETDEPS += $$PWD/../build/NetworkDebug/libNetwork.a

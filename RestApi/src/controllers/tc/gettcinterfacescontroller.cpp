@@ -43,10 +43,9 @@ void GetTcInterfacesController::service(HttpRequest &request, HttpResponse &resp
         if(timer.isActive()){
             QJsonObject res = network->getResponse(thread);
 
+            res.insert("host", ip);
             QString resStatus = res["resStatus"].toString();
             QString resBody = res["resBody"].toString();
-
-            qDebug() << resBody;
 
             if(resStatus == "200"){
                 response.setStatus(200,"Ok");

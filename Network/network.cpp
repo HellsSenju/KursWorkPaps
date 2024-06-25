@@ -67,7 +67,7 @@ void Network::post(const QString &url, QJsonObject body)
 }
 
 void Network::deleteThread(QThread *thread)
-{   
+{
     thread->quit();
     thread->wait();
 

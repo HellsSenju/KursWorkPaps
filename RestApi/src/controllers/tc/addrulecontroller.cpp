@@ -64,6 +64,7 @@ void AddRuleController::service(HttpRequest &request, HttpResponse &response)
             response.write(resBody.toUtf8(), true);
         }
         else{
+            thread->quit();
             response.setStatus(504, "Gateway Timeout");
             response.setHeader("Content-Type", "application/json");
 

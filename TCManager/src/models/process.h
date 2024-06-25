@@ -11,17 +11,12 @@ public:
     explicit Process(QUuid processUuid);
 
     QString getOutput() override{
-//        QJsonDocument doc;
-//        doc.setArray(interfaces);
-
         return QJsonDocument(interfaces).toJson(QJsonDocument::Compact);
     };
 
 private:
     QJsonArray interfaces;
 
-private slots:
-    void onStandartOutput() override;
 };
 
 #endif // PROCESS_H
