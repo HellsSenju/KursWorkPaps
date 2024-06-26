@@ -51,6 +51,7 @@ public:
     };
 
     virtual QString getOutput(){
+        output.remove("\n");
         return output;
     };
 

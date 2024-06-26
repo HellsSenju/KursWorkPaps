@@ -11,6 +11,9 @@ void GetInterfacesController::service(HttpRequest &request, HttpResponse &respon
     QJsonObject body =  network->parseRequest(request.getBody());
     QString uuid = body["uuid"].toString();
 
+    response.setStatus(200,"Ok");
+    response.setHeader("Content-Type", "application/json");
+
     QTimer timer;
     timer.setSingleShot(true);
     QEventLoop loop;
@@ -27,51 +30,46 @@ void GetInterfacesController::service(HttpRequest &request, HttpResponse &respon
         return;
     }
 
-    timer.start(10000); //10 sec
-
     pool->execute(uuid, Programs::NMCLI, body["command"].toString());
 
+    timer.start(10000); //10 sec
     loop.exec();
 
-    response.setStatus(200,"Ok");
-    response.setHeader("Content-Type", "application/json");
+    QJsonObject object;
+
+    QString error = pool->getProcessError(uuid);
+    if(!error.isEmpty())
+        object["error"] = error;
+
+    QString output = pool->getProcessOutput(uuid);
+    if(!output.isEmpty())
+        object["output"] = output;
 
     switch (pool->getProcessState(uuid)) {
     case ProcessState::Finished:
     {
-        QJsonObject object{
-            {"TCManager", pool->getProcessOutput(uuid)}
-        };
-
+        object.insert("TCManager", "Выполнился.");
         response.write(QJsonDocument(object).toJson(QJsonDocument::Compact), true);
      }
         break;
 
     case ProcessState::Crashed:
     {
-        QJsonObject object{
-            {"TCManager", "Crashed"}
-        };
-
+        object.insert("TCManager", "Процесс завершился сбоем через некоторое время после успешного запуска.");
         response.write(QJsonDocument(object).toJson(QJsonDocument::Compact), true);
     }
         break;
 
     case ProcessState::FailedToStart:
     {
-        QJsonObject object{
-            {"TCManager", "FailedToStart"}
-        };
-
+        object.insert("TCManager", "Не удалось запустить процесс. "
+                                   "Либо программа отсутствует, либо недостаточно прав для запуска, либо неверная команда.");
         response.write(QJsonDocument(object).toJson(QJsonDocument::Compact), true);
     }
         break;
 
     default:
-        QJsonObject object{
-            {"TCManager", "default"}
-        };
-
+        object.insert("TCManager", "Неизвестая ошибка. Попробуйте запустить еще раз.");
         response.write(QJsonDocument(object).toJson(QJsonDocument::Compact), true);
         break;
     }

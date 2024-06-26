@@ -11,15 +11,12 @@ TCProcess::TCProcess(QUuid processUuid)
     {
         switch (newState) {
         case 0: //not running
-            qDebug("stateChanged : Процесс not running %s", qPrintable(getUuid()));
             break;
         case 1: //starting
-            qDebug("stateChanged : Процесс запускается, но программа еще не была вызвана %s", qPrintable(getUuid()));
-//            setState(ProcessState::Starting);
             break;
         case 2: // running
-            qDebug("stateChanged : Процесс запущен и готов к чтению и записи %s", qPrintable(getUuid()));
-//            setState(ProcessState::Running);
+            qDebug("TCProcess : Процесс запущен и готов к чтению и записи %s", qPrintable(getUuid()));
+            setState(ProcessState::Running);
             break;
   }
     });
@@ -33,16 +30,13 @@ TCProcess::TCProcess(QUuid processUuid)
                exitStatus
         );
 
-        if(exitStatus == 0){
-            setState(ProcessState::Finished);
-        }
-        else{
-            setState(ProcessState::Crashed);
-        }
+        output = process->readAllStandardOutput();
 
         QJsonObject body;
         body["uuid"] = getUuid();
         body["from"] = "TCManager";
+        body["command"] = process->arguments().join(" ");
+        body["output"] = output;
         body["exitStatus"] = exitStatus;
         body["exitCode"] = exitCode;
 
@@ -50,7 +44,12 @@ TCProcess::TCProcess(QUuid processUuid)
             body["error"] = error;
 
         network->post("/iperf/finished", body);
-        emit deleteProcess(getUuid());
 
+        if(exitStatus == 0){
+            setState(ProcessState::Finished);
+        }
+        else{
+            setState(ProcessState::Crashed);
+        }
     });
 }

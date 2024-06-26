@@ -37,7 +37,7 @@ void AddRuleController::service(HttpRequest &request, HttpResponse &response)
         QThread* thread = network->post("/add", ip, port, body);
         connect( thread, &QThread::finished, &loop, &QEventLoop::quit);
 
-        timer.start(10000); //10 sec
+        timer.start(40000); //10 sec
         loop.exec();
 
         if(timer.isActive()){

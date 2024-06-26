@@ -30,7 +30,7 @@ QThread *Network::post(QString url, QString ip, int port, QJsonObject body)
                                         ip,
                                         port);
 
-    connect(this, &Network::destroyed, thread, &QThread::terminate);
+    connect(this, &Network::destroyed, thread, &QThread::quit);
     connect(sender, &HttpSender::finished, thread, &QThread::quit);
     connect(sender, &HttpSender::hadResult, this, &Network::onResult,
             Qt::ConnectionType::QueuedConnection);
@@ -53,9 +53,9 @@ void Network::post(const QString &url, QJsonObject body)
                                         ip,
                                         port);
 
-    connect(this, &Network::destroyed, thread, &QThread::terminate);
+    connect(this, &Network::destroyed, thread, &QThread::quit);
     connect(thread, &QThread::started, sender, &HttpSender::run);
-    connect(sender, &HttpSender::finished, thread, &QThread::terminate);
+    connect(sender, &HttpSender::finished, thread, &QThread::quit);
     connect(sender, &HttpSender::hadResult, this, &Network::onResult,
             Qt::ConnectionType::QueuedConnection);
     connect(thread, &QThread::finished, this, &Network::onThreadFinished);
@@ -72,7 +72,7 @@ void Network::deleteThread(QThread *thread)
     thread->wait();
 
     HttpSender* sender = pool.value(thread);
-    qDebug("Удаление потока и сендера.");
+    qDebug("deleteThread : Удаление потока и сендера.");
 
     disconnect(thread, &QThread::started, sender, &HttpSender::run);
     disconnect(sender, &HttpSender::finished, thread, &QThread::quit);
@@ -94,10 +94,10 @@ void Network::onThreadFinished()
     QThread* thread = qobject_cast<QThread*>(p);
     HttpSender* sender = pool.value(thread);
 
-    qDebug("Удаление потока и сендера.");
+    qDebug("onThreadFinished : Удаление потока и сендера.");
 
     disconnect(thread, &QThread::started, sender, &HttpSender::run);
-    disconnect(sender, &HttpSender::finished, thread, &QThread::terminate);
+    disconnect(sender, &HttpSender::finished, thread, &QThread::quit);
     disconnect(sender, &HttpSender::hadResult, this, &Network::onResult);
     disconnect(thread, &QThread::finished, this, &Network::onThreadFinished);
 

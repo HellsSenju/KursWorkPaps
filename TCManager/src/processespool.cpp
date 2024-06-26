@@ -58,12 +58,16 @@ void ProcessesPool::onStateChanged(ProcessState state)
 
     case ProcessState::Crashed:
         qDebug("ProcessesPool : onProcessStateChaned : %s crashed", qPrintable(process->getUuid()));
+        disconnect(process, &AbstractProcess::stateChanged,
+                   this, &ProcessesPool::onStateChanged);
 
         emit executed();
         break;
 
     case ProcessState::FailedToStart:
         qDebug("ProcessesPool : onProcessStateChaned : %s failed to start", qPrintable(process->getUuid()));
+        disconnect(process, &AbstractProcess::stateChanged,
+                   this, &ProcessesPool::onStateChanged);
 
         emit executed();
         break;

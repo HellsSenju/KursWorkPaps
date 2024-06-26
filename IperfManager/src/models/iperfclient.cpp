@@ -35,12 +35,6 @@ IperfClient::IperfClient(QUuid processUuid)
                exitCode,
                exitStatus
         );
-        if(exitStatus == 0){
-            setState(ProcessState::Finished);
-        }
-        else{
-            setState(ProcessState::Crashed);
-        }
 
         QStringList output = QString(process->readAllStandardOutput()).split("\n");
 
@@ -77,11 +71,21 @@ IperfClient::IperfClient(QUuid processUuid)
                 {"exitCode", exitCode}
             };
 
+            body["command"] = process->arguments().join(" ");
+
             if(!error.isEmpty())
                 body["error"] = error;
 
             network->post("/iperf/finished", body);
             emit deleteProcess(getUuid());
         }
+
+        if(exitStatus == 0){
+            setState(ProcessState::Finished);
+        }
+        else{
+            setState(ProcessState::Crashed);
+        }
+
     });
 }
