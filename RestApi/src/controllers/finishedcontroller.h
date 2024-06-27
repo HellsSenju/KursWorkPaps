@@ -2,9 +2,9 @@
 #define FINISHEDIPERFCONTROLLER_H
 
 #include "httprequesthandler.h"
-#include "../../global.h"
-#include "../../databaseconnection.h"
-#include "../../globalnetwork.h"
+#include "../global.h"
+#include "../databaseconnection.h"
+#include "../globalnetwork.h"
 
 
 using namespace stefanfrings;

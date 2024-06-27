@@ -296,38 +296,3 @@ void DataBaseConnection::setNewLastTime(QString newTime)
     file.close();
 }
 
-bool DataBaseConnection::update(QString dbName, QString tableName, QJsonObject values, QString filter)
-{
-    QSqlQuery q = QSqlQuery(db.database(dbName));
-    QString SQL = QString("UPDATE %1 SET ").arg(tableName);
-
-    for(QString prop : values.keys()){
-        QString add = QString("%1 = ?").arg(prop);
-        if(values.keys().indexOf(prop) != values.size()-1) add += ",";
-        SQL += add;
-    }
-
-    SQL += " ";
-    SQL += filter;
-
-    if(!q.prepare(SQL)){
-        qDebug() << "prepare fasle";
-        qDebug() << q.lastError().text();
-        return false;
-    }
-
-    for(QString prop : values.keys()){
-        if(values[prop].isString())
-            q.addBindValue(values[prop].toString());
-        else if(values[prop].isDouble())
-            q.addBindValue(values[prop].toDouble());
-    }
-
-    if(!q.exec()){
-        qDebug() << "exec fasle";
-        qDebug() << q.lastError().text();
-        return false;
-    }
-
-    return true;
-}

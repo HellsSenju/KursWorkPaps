@@ -1,4 +1,4 @@
-#include "finishediperfcontroller.h"
+#include "finishedcontroller.h"
 
 #include <QUuid>
 

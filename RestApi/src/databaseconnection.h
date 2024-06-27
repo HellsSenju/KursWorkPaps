@@ -42,8 +42,6 @@ public:
     /** Добавление записи статистики в базу данных*/
     QJsonObject insertStatistic(QSqlQuery query, QJsonObject data);
 
-    bool update(QString dbName, QString tableName, QJsonObject values, QString filter);
-
     const QString &getDbName() const;
     const QString &getHostName() const;
     const QString &getUser() const;

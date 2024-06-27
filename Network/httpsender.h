@@ -20,12 +20,9 @@ public:
                         QString uuid = "",
                         QObject *parent = nullptr);
 
+    /** получение ответа от сокета */
     const QJsonObject &getResponse() const{
         return response;
-    };
-
-    const QString &getUuid() const{
-        return uuid;
     };
 
 private:
@@ -37,11 +34,11 @@ private:
     QJsonObject response;
 
 public slots:
+    /** логика выполения подключения и получения ответа */
     void run();
 
 signals:
     void finished();
-    void written(bool res);
     void hadResult(QJsonObject res);
 
 };

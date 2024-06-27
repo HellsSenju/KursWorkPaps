@@ -17,7 +17,7 @@ void GetRuleController::service(HttpRequest &request, HttpResponse &response)
         response.setHeader("Content-Type", "application/json");
 
         QJsonObject object{
-            {"RestApi", "Обязательные поля: ip, port, uuid, command."}
+            {"RestApi", "Обязательные поля: ip, port, uuid, interface."}
         };
 
         response.write(QJsonDocument(object).toJson(QJsonDocument::Compact), true);
@@ -28,7 +28,7 @@ void GetRuleController::service(HttpRequest &request, HttpResponse &response)
 
         QJsonObject body{
             {"uuid", req.value("uuid")},
-            {"command", req.value("command")}
+            {"interface", req.value("interface")}
         };
 
         QTimer timer;
@@ -88,7 +88,7 @@ bool GetRuleController::checkRequest(QJsonObject request)
     if(!request.contains("ip") ||
             !request.contains("port") ||
             !request.contains("uuid") ||
-            !request.contains("command"))
+            !request.contains("interface"))
         return false;
 
     return true;
