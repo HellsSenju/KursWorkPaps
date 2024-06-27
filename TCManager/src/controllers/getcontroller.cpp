@@ -30,7 +30,7 @@ void GetController::service(HttpRequest &request, HttpResponse &response)
         return;
     }
 
-    pool->execute(uuid, Programs::TC, body["command"].toString());
+    pool->execute(uuid, Programs::TC, QString("-p qdisc show dev %1").arg(body["interface"].toString()));
 
     timer.start(10000); //10 sec
     loop.exec();

@@ -6,7 +6,6 @@ IperfClient::IperfClient(QUuid processUuid)
     uuid = processUuid;
     server = false;
 
-    connect(process, &QProcess::readyReadStandardOutput, this, &IperfClient::onStandartOutput);
     connect(process, &QProcess::readyReadStandardError, this, &IperfClient::onStandartError);
     connect(process, &QProcess::errorOccurred, this, &IperfClient::onErrorOccurred);
 

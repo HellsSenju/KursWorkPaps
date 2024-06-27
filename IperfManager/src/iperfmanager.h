@@ -30,13 +30,13 @@ public:
         return pool.contains(uuid);
     };
 
+    void startNewProcess(bool server, const QString &uuid, const QString &command);
 
 private:
     QMap<QString, AbstractIperf*> pool;
 
 
 public slots:
-    void startNewProcess(bool server, const QString &uuid, const QString &command);
     void stopProcess(const QString &uuid);
     void deleteProcess(const QString &uuid);
 
