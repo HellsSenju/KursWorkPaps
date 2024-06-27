@@ -9,7 +9,7 @@ CONFIG -= app_bundle
 OTHER_FILES += etc/* logs/*
 
 SOURCES += \
-        src/controllers/iperf/finishediperfcontroller.cpp \
+        src/controllers/finishedcontroller.cpp \
         src/controllers/iperf/statisticfromiperfcontroller.cpp \
         src/controllers/notificationscontroller.cpp \
         src/controllers/statisticcontroller.cpp \
@@ -33,7 +33,7 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 HEADERS += \
-        src/controllers/iperf/finishediperfcontroller.h \
+        src/controllers/finishedcontroller.h \
         src/controllers/iperf/statisticfromiperfcontroller.h \
         src/controllers/notificationscontroller.h \
         src/controllers/statisticcontroller.h \

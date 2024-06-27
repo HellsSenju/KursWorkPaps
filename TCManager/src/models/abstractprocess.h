@@ -24,37 +24,40 @@ public:
         process->deleteLater();
     };
 
+    /** Установка параметров для процесса */
     virtual void setParams(const QString &program, const QStringList &args){
         process->setProgram(program);
         process->setArguments(args);
     };
 
+    /** Запуск процесса*/
     virtual void execute(){
         process->start();
     };
 
+    /** Остановка процесса*/
     virtual void stop(){
         stoped = true;
         process->terminate();
     };
 
+    /** Получени идентификатора процесса */
     virtual QString getUuid(){
         return uuid.toString(QUuid::WithoutBraces);
     };
 
-    virtual const char* getUuidChar(){
-        return qPrintable(uuid.toString(QUuid::WithoutBraces));
-    };
-
+    /** Получение состояния процесса */
     virtual ProcessState getState(){
         return state;
     };
 
+    /** Получение стандартного вывода процесса */
     virtual QString getOutput(){
         output.remove("\n");
         return output;
     };
 
+    /** Получение ошибок от процесса */
     virtual QString getError(){
         error.remove("\n");
         return error;
@@ -68,23 +71,27 @@ protected:
     QString error = "";
     bool stoped = false;
 
+    /** сеттер для состояния процесса */
     virtual void setState(ProcessState newState){
         state = newState;
         emit stateChanged(state);
     };
 
 protected slots:
+    /** слот для вывода */
     virtual void onStandartOutput(){
         output = process->readAll();
         qDebug() << "standartOutput: " << output;
     };
 
+    /** слот для ошибок от процесса */
     virtual void onStandartError(){
         QString temp = process->readAllStandardError();
         error.append(temp);
         qDebug("standartError (%s): %s", qPrintable(getUuid()), qPrintable(temp));
     };
 
+    /** слот на сигнал о получении стандартных ошибок */
     virtual void onErrorOccurred(QProcess::ProcessError error){
         switch (error) {
         case 0:
@@ -120,7 +127,9 @@ protected slots:
 
 
 signals:
+    /** сигнал изменения статуса*/
     void stateChanged(ProcessState state);
+    /** сигнал для удаления процесса из менеджера */
     void deleteProcess(const QString &uuid);
 };
 

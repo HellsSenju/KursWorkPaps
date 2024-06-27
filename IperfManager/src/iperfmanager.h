@@ -20,10 +20,12 @@ public:
     explicit IperfManager(QObject* parent=0);
     ~IperfManager();
 
+    /** получние статуса процесса по идентификатору*/
     ProcessState getProcessStatus(const QString &uuid){
         return pool.value(uuid)->getState();
     };
 
+    /** проверка идентификатора */
     bool checkDublicates(const QString& uuid){
         return pool.contains(uuid);
     };

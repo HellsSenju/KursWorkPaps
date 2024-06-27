@@ -2,11 +2,11 @@
 
 #include <QUuid>
 
-FinishedIperfController::FinishedIperfController()
+FinishedController::FinishedController()
 {
 }
 
-void FinishedIperfController::service(HttpRequest &request, HttpResponse &response)
+void FinishedController::service(HttpRequest &request, HttpResponse &response)
 {
     qDebug().noquote() << "FinishedIperfController : " << request.getBody();
     QJsonObject req = network->parseRequest(request.getBody());

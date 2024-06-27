@@ -43,7 +43,7 @@ TCProcess::TCProcess(QUuid processUuid)
         if(!error.isEmpty())
             body["error"] = error;
 
-        network->post("/iperf/finished", body);
+        network->post("/finished", body);
 
         if(exitStatus == 0){
             setState(ProcessState::Finished);

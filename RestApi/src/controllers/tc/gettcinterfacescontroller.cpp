@@ -15,7 +15,7 @@ void GetTcInterfacesController::service(HttpRequest &request, HttpResponse &resp
         response.setHeader("Content-Type", "application/json");
 
         QJsonObject object{
-            {"RestApi", "Обязательные поля: ip, port, uuid, command."}
+            {"RestApi", "Обязательные поля: ip, port, uuid."}
         };
 
         response.write(QJsonDocument(object).toJson(QJsonDocument::Compact), true);
@@ -25,8 +25,7 @@ void GetTcInterfacesController::service(HttpRequest &request, HttpResponse &resp
         int port = req.value("port").toInt();
 
         QJsonObject body{
-            {"uuid", req.value("uuid")},
-            {"command", req.value("command")}
+            {"uuid", req.value("uuid")}
         };
 
         QTimer timer;
@@ -86,8 +85,7 @@ bool GetTcInterfacesController::checkRequest(QJsonObject request)
 {
     if(!request.contains("ip") ||
             !request.contains("port") ||
-            !request.contains("uuid") ||
-            !request.contains("command"))
+            !request.contains("uuid"))
         return false;
 
     return true;

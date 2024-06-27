@@ -19,7 +19,6 @@ SOURCES += \
     src/globalnetwork.cpp \
     src/models/process.cpp \
     src/models/tcprocess.cpp \
-    src/myapplication.cpp \
     src/processespool.cpp \
     src/global.cpp \
     src/main.cpp
@@ -41,7 +40,6 @@ HEADERS += \
     src/models/process.h \
     src/models/tcprocess.h\
     src/global.h \
-    src/myapplication.h \
     src/processespool.h
 
 include(../QtWebApp/httpserver/httpserver.pri)nET

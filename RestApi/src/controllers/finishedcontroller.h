@@ -9,13 +9,13 @@
 
 using namespace stefanfrings;
 
-class FinishedIperfController: public HttpRequestHandler
+class FinishedController: public HttpRequestHandler
 {
     Q_OBJECT
-    Q_DISABLE_COPY(FinishedIperfController)
+    Q_DISABLE_COPY(FinishedController)
 
 public:
-    FinishedIperfController();
+    FinishedController();
 
     void service(HttpRequest& request, HttpResponse& response);
 

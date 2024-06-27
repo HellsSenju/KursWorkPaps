@@ -23,11 +23,6 @@ public:
     explicit Network(const QSettings* settings, QObject *parent = nullptr);
     ~Network();
 
-    struct Response{
-        QString resStatus;
-        QString resBody;
-    };
-
     QThread *post(QString url, QString ip, int port, QJsonObject body);
 
     void post(const QString &url, QJsonObject body);

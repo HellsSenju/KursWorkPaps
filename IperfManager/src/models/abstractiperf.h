@@ -22,39 +22,33 @@ public:
         process->deleteLater();
     };
 
+    /** Установка параметров для процесса */
     virtual void setParams(const QString &program, const QStringList &args){
         process->setProgram(program);
         process->setArguments(args);
     };
 
+    /** Запуск процесса*/
     virtual void start(){
         process->start();
     };
 
+    /** Остановка процесса*/
     virtual void stop(){
-        process->terminate();
         stoped = true;
+        process->terminate();
     };
 
-    virtual void waitForFinished(int sec = 30){
-        process->waitForFinished(sec);
-    }; //-1 - бесконечное ожидание
-
+    /** Получени идентификатора процесса */
     virtual QString getUuid(){
         return uuid.toString(QUuid::WithoutBraces);
     };
 
-    virtual const char& getUuidChar(){
-        return *qPrintable(uuid.toString(QUuid::WithoutBraces));
-    };
-
+    /** Получение состояния процесса */
     virtual ProcessState getState(){
         return state;
     };
 
-    virtual bool isServer(){
-        return server;
-    }
 
 protected:
     QUuid uuid;
@@ -64,27 +58,28 @@ protected:
     bool server;
     bool stoped = false;
 
+    /** сеттер для состояния процесса */
     virtual void setState(ProcessState state){
         this->state = state;
         emit stateChanged(state);
     };
 
 protected slots:
-    virtual void onStandartOutput(){
-//        qDebug() << "Iperf : standartOutput: " <<  process->readAll();
-    };
 
+    /** слот для ошибок от процесса */
     virtual void onStandartError(){
         QString temp = process->readAllStandardError();
         error.append(temp + " ");
         qDebug("standartError (%s): %s", qPrintable(getUuid()), qPrintable(temp));
     };
 
+    /** слот на сигнал о старте процесса */
     virtual void onStarted(){
         qDebug("Iperf : Процесс запущен и готов к чтению и записи %s", qPrintable(uuid.toString()));
         setState(ProcessState::Running);
     };
 
+    /** слот на сигнал о получении стандартных ошибок */
     virtual void onErrorOccurred(QProcess::ProcessError error){
         switch (error) {
         case QProcess::ProcessError::FailedToStart :
@@ -111,7 +106,9 @@ protected slots:
     };
 
 signals:
+    /** сигнал изменения статуса*/
     void stateChanged(ProcessState state);
+    /** сигнал для удаления процесса из менеджера */
     void deleteProcess(const QString &uuid);
 
 };

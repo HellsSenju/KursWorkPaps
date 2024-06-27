@@ -3,7 +3,6 @@
 
 #include "./iperf/startiperfcontroller.h"
 #include "./iperf/stopiperfcontroller.h"
-#include "./iperf/finishediperfcontroller.h"
 #include "./iperf/statisticfromiperfcontroller.h"
 
 #include "./tc/addrulecontroller.h"
@@ -12,6 +11,7 @@
 #include "./tc/updaterulecontroller.h"
 #include "./tc/deleterulecontroller.h"
 
+#include "./finishedcontroller.h"
 #include "notificationscontroller.h"
 #include "statisticcontroller.h"
 
@@ -32,9 +32,6 @@ void RequestMapper::service(HttpRequest& request, HttpResponse& response)
     QByteArray path=request.getPath();
     qDebug("RequestMapper: path=%s",path.data());
 
-//    HttpSession session = sessionStore->getSession(request, response);
-//    qDebug("RequestMapper: sessionId = %s", session.getId().data());
-
 
     if (path.startsWith("/iperf/start"))
         StartIperfController().service(request, response);
@@ -49,8 +46,8 @@ void RequestMapper::service(HttpRequest& request, HttpResponse& response)
         StatisticController().service(request, response);
 
     // получение информации о завершении процесса
-    else if (path.startsWith("/iperf/finished"))
-        FinishedIperfController().service(request, response);
+    else if (path.startsWith("/finished"))
+        FinishedController().service(request, response);
 
     else if (path.startsWith("/tc/get"))
         GetRuleController().service(request, response);

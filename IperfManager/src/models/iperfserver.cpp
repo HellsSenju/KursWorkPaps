@@ -47,7 +47,7 @@ IperfServer::IperfServer(QUuid processUuid)
             if(!error.isEmpty())
                 body["error"] = error;
 
-            network->post("/iperf/finished", body);
+            network->post("/finished", body);
             emit deleteProcess(getUuid());
         }
 

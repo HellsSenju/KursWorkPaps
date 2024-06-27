@@ -30,7 +30,7 @@ void GetInterfacesController::service(HttpRequest &request, HttpResponse &respon
         return;
     }
 
-    pool->execute(uuid, Programs::NMCLI, body["command"].toString());
+    pool->execute(uuid, Programs::NMCLI, "device status");
 
     timer.start(10000); //10 sec
     loop.exec();
