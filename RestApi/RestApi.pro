@@ -22,6 +22,8 @@ SOURCES += \
         src/controllers/iperf/stopiperfcontroller.cpp \
         src/controllers/requestmapper.cpp \
         src/databaseconnection.cpp \
+        src/databaseengine.cpp \
+        src/dbworker.cpp \
         src/globalnetwork.cpp \
         src/main.cpp\
         src/global.cpp
@@ -46,6 +48,8 @@ HEADERS += \
         src/controllers/iperf/stopiperfcontroller.h \
         src/controllers/requestmapper.h \
         src/databaseconnection.h \
+        src/databaseengine.h \
+        src/dbworker.h \
         src/global.h \
         src/globalnetwork.h
 
